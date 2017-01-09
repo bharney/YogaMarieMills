@@ -1,0 +1,8 @@
+node_modules/
+bin/
+obj/
+.vs/
+typings/
+YogaMarieMills.njsproj
+YogamarieMills.sln
+desktop.ini
