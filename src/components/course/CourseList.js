@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, {PropTypes} from 'react';
 import CourseListRow from './CourseListRow';
 
@@ -27,3 +28,34 @@ CourseList.propTypes = {
 }
 
 export default CourseList;
+=======
+import React, {PropTypes} from 'react';
+import CourseListRow from './CourseListRow';
+
+const CourseList = ({courses}) => {
+    return (
+      <table className="table">
+        <thead>
+          <tr>
+            <th>&nbsp;</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Category</th>
+            <th>Length</th>
+          </tr>
+        </thead>
+        <tbody>
+          {courses.map(course =>
+            <CourseListRow key={course.id} course={course} />
+          )}
+        </tbody>
+      </table>
+    );
+};
+
+CourseList.propTypes = {
+  courses: PropTypes.array.isRequired
+}
+
+export default CourseList;
+>>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596

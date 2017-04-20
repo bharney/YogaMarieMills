@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import blogApi from '../API/mockBlogApi';
 
 export function loadBlogSuccess(blogs) {
@@ -49,3 +50,20 @@ export function saveBlog(blog) {
     });
   };
 }
+=======
+import blogApi from '../API/mockBlogApi';
+
+export function loadBlogSuccess(blogs) {
+    return { type: 'LOAD_BLOG_SUCCESS', blogs};
+}
+
+export function loadBlog() {
+    return function (dispatch) {
+        return blogApi.getAllBlogs().then(blogs => {
+            dispatch(loadBlogSuccess(blogs));
+    }).catch(error => {
+      throw(error);
+    });
+  };
+}
+>>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596

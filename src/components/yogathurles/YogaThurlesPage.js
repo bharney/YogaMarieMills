@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -73,3 +74,18 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(YogaThurlesPage);
+=======
+﻿import React, { PropTypes } from 'react';
+
+class YogaThurlesPage extends React.Component {
+    render() {
+        return (
+            <div>
+                Yoga Here!
+            </div>
+        );
+    };
+}
+
+export default YogaThurlesPage;
+>>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 $color: #212121;
 $bgColor: #607D8B;
 
@@ -1605,4 +1606,510 @@ Media queries
 
 .m-b-50 {
     margin-bottom: 50px;
+=======
+
+@font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 300;
+    src: local("Open Sans Light"), local("OpenSans-Light"), url(//fonts.gstatic.com/s/opensans/v13/DXI1ORHCpsQm3Vp6mXoaTegdm0LZdjqr5-oayXSOefg.woff2) format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+
+/*$color: #ffffff;
+$bgColor: #ff7701;
+
+$lightColor: #ffffff;
+$lightBgColor: #0079c3;
+
+$darkColor: #292928;
+$darkBgColor: #059396;
+
+*/
+
+$color: #ffffff;
+$bgColor: #1B5E20;
+
+$lightColor: #fff;
+$lightBgColor:#388E3C;
+
+$darkColor: #292928;
+$darkBgColor:#1B5E20;
+
+$brightColor: #ff7701;
+$brightBgColor: #81C784;
+
+$hoverColor: #ffffff;
+$hoverBgColor: rgba(0, 0, 0, 0.0980392);
+
+
+@mixin font-size($fs-map, $fs-breakpoints: $breakpoints) {
+    @each $fs-breakpoint, $fs-font-size in $fs-map {
+        @if $fs-breakpoint == null {
+            @include make-font-size($fs-font-size);
+        }
+        @else {
+            // If $fs-font-size is a key that exists in
+            // $fs-breakpoints, use the value
+            @if map-has-key($fs-breakpoints, $fs-breakpoint) {
+                $fs-breakpoint: map-get($fs-breakpoints, $fs-breakpoint);
+            }
+
+            @media screen and (min-width: $fs-breakpoint) {
+                @include make-font-size($fs-font-size);
+            }
+        }
+    }
+}
+
+// Utility function for mixin font-size
+@mixin make-font-size($fs-font-size) {
+    // If $fs-font-size is a list, include
+    // both font-size and line-height
+    @if type-of($fs-font-size) == "list" {
+        font-size: nth($fs-font-size, 1);
+
+        @if (length($fs-font-size) > 1) {
+            line-height: nth($fs-font-size, 2);
+        }
+    }
+    @else {
+        font-size: $fs-font-size;
+    }
+}
+
+$fs-breakpoint: ( );
+
+$breakpoints: ( small : 480px, medium: 825px, large : 1119px );
+
+$p-font-sizes: ( null : (16px, 1.3), small : 16px, 727px : 18px, medium: (18px, 1.4), 980px : 18px, large : (18px, 1.45), 1440px: 18px, );
+
+$h1-font-sizes: ( null : (56px, 1.3), small : 56px, medium: (60px, 1.4), 980px : 72px, large : (78px, 1.45), 1440px: 90px, );
+
+$h2-font-sizes: ( null : (34px, 1.3), small : 34px, medium: (34px, 1.4), 980px: 34px, large : (34px, 1.45), 1440px: 38px, );
+
+$h3-font-sizes: ( null : (22px, 1.0), small : 22px, medium: (22px, 1.2), 980px: 24px, large : (28px, 1.45), 1440px: 28px, );
+
+$h4-font-sizes: ( null : (22px, 1.0), small : 22px, medium: (22px, 1.2), 980px: 20px, large : (22px, 1.45), 1440px: 22px, );
+
+
+p, ul, li {
+    @include font-size($p-font-sizes);
+}
+
+h1 {
+    @include font-size($h1-font-sizes);
+}
+
+h2 {
+    @include font-size($h2-font-sizes);
+}
+
+h3 {
+    @include font-size($h3-font-sizes);
+}
+
+h4 {
+    @include font-size($h4-font-sizes);
+}
+
+body {
+    color: $color;
+    background: $lightBgColor;
+    text-shadow: none;
+    font-family:'Open Sans', sans-serif;
+
+}
+
+.dark-color {
+    color: $darkColor;
+}
+
+.dark-bg-color {
+    background: $darkBgColor;
+}
+
+.light-color {
+    color: $lightColor;
+}
+
+.light-bg-color {
+    background: $lightBgColor;
+}
+
+.bright-bg-color {
+    background: $brightBgColor;
+}
+
+.bg-color {
+    background: $bgColor;
+}
+
+.color {
+    color: $color;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    font-family:'Open Sans', sans-serif;
+}
+
+.font-style{
+    font-family:'Open Sans', sans-serif;
+}
+
+a {
+    color: $lightColor;
+}
+/*-- hover --*/
+
+a:hover {
+    background-color: $hoverBgColor;
+    text-decoration: none;
+    color: $color;
+}
+
+.nav-menu-left:hover{
+   background-color:$hoverBgColor;
+   cursor: pointer;
+    color: $color;
+}
+
+/*===========================
+  --- Banner ----
+=========================== */
+.ribbon{
+  width: 100%;
+  height: 30vh;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
+}
+
+
+/*===========================
+  --- Sections ----
+=========================== */
+
+section.section {
+    margin: 0;
+    padding: 80px 0 60px 0;
+}
+
+.bg-white {
+    background-color: #ffffff;
+}
+
+.bg-grey {
+    background-color: rgba(0, 0, 0, 0.0980392);
+}
+
+.bg-black {
+    background-color: #0c0c0c;
+}
+
+/*===========================
+  --- Header & Nav ----
+=========================== */
+
+.title {
+    cursor: pointer;
+}
+
+.nav-element-left {
+    padding-left: 0;
+    padding-right: 5px;
+}
+
+.drawer-header {
+    padding-left: 20px;
+}
+
+
+.nav-vertical-divider {
+    border-left: inset 1px;
+    height: 100%;
+}
+
+.nav-menu-left {
+    height: 100%;
+    padding-left: 15px;
+    padding-right: 20px;
+    border-right: inset 1px;
+}
+.nav-links{
+    color: $lightColor;
+}
+/*=========================
+  Footer
+ ================= */
+
+.btn-round-lg {
+    border-radius: 22.5px;
+}
+
+.btn-round {
+    border-radius: 17px;
+}
+
+.btn-round-sm {
+    border-radius: 15px;
+}
+
+.btn-round-xs {
+    border-radius: 11px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/*=========================
+    About
+=========================*/
+#about {
+    width:60vw;
+}
+
+#work {
+    width:60vw;
+}
+
+#questions {
+    width:60vw;
+}
+
+
+/*=========================
+    Home
+=========================*/
+
+.tile {
+    float: left;
+}
+
+.mdl-card {
+    width: 100%;
+    
+}
+
+.mdl-grid {
+    padding: 0;
+}
+
+/* ========================================
+Media queries
+========================================= */
+@media (min-width: 959px) and (max-width: 1199px) {
+}
+
+@media only screen and (min-device-width : 979px) and (max-device-width : 1024px) {
+}
+
+
+@media only screen and (min-width: 768px) and (max-width: 959px) {
+}
+
+@media (max-width: 767px) {
+
+
+}
+
+
+/* ---- padding ---- */
+/* top */
+.p-t-0 {
+    padding-top: 0;
+}
+
+.p-t-5 {
+    padding-top: 5px;
+}
+
+.p-t-10 {
+    padding-top: 10px;
+}
+
+.p-t-15 {
+    padding-top: 15px;
+}
+
+.p-t-20 {
+    padding-top: 20px;
+}
+
+.p-t-25 {
+    padding-top: 25px;
+}
+
+.pad-top30 {
+    padding-top: 30px;
+}
+
+.p-t-35 {
+    padding-top: 35px;
+}
+
+.p-t-40 {
+    padding-top: 40px;
+}
+/* bottom */
+.p-b-0 {
+    padding-bottom: 0;
+}
+
+.p-b-5 {
+    padding-bottom: 5px;
+}
+
+.p-b-10 {
+    padding-bottom: 10px;
+}
+
+.p-b-15 {
+    padding-bottom: 15px;
+}
+
+.p-b-20 {
+    padding-bottom: 20px;
+}
+
+.p-b-25 {
+    padding-bottom: 25px;
+}
+
+.p-b-30 {
+    padding-bottom: 30px;
+}
+
+.p-b-35 {
+    padding-bottom: 35px;
+}
+
+.p-b-40 {
+    padding-bottom: 40px;
+}
+
+
+/* ---- margin --- */
+.m-l-5 {
+    margin-left: 5px;
+}
+
+.mar-left10 {
+    margin-left: 10px;
+}
+
+.m-l-15 {
+    margin-left: 15px;
+}
+
+.m-l-20 {
+    margin-left: 20px;
+}
+
+.m-l-25 {
+    margin-left: 25px;
+}
+
+.m-l-30 {
+    margin-left: 30px;
+}
+
+.m-r-5 {
+    margin-right: 5px;
+}
+
+.m-r-10 {
+    margin-right: 10px;
+}
+
+.m-r-15 {
+    margin-right: 15px;
+}
+
+.m-r-20 {
+    margin-right: 20px;
+}
+
+.m-r-25 {
+    margin-right: 25px;
+}
+
+.m-r-30 {
+    margin-right: 30px;
+}
+
+/* top */
+.m-t-0 {
+    margin-top: 0;
+}
+
+.m-t-5 {
+    margin-top: 5px;
+}
+
+.m-t-10 {
+    margin-top: 10px;
+}
+
+.m-t-15 {
+    margin-top: 15px;
+}
+
+.m-t-20 {
+    margin-top: 20px;
+}
+
+.m-t-25 {
+    margin-top: 25px;
+}
+
+.m-t-30 {
+    margin-top: 30px;
+}
+
+.m-t-35 {
+    margin-top: 35px;
+}
+
+.m-t-40 {
+    margin-top: 40px;
+}
+
+
+/* bottom */
+.m-b-0 {
+    margin-bottom: 0;
+}
+
+.m-b-5 {
+    margin-bottom: 5px;
+}
+
+.m-b-10 {
+    margin-bottom: 10px;
+}
+
+.m-b-15 {
+    margin-bottom: 15px;
+}
+
+.m-b-20 {
+    margin-bottom: 20px;
+}
+
+.m-b-25 {
+    margin-bottom: 25px;
+}
+
+.m-b-30 {
+    margin-bottom: 30px;
+}
+
+.m-b-35 {
+    margin-bottom: 35px;
+}
+
+.m-b-40 {
+    margin-bottom: 40px;
+>>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596
 }

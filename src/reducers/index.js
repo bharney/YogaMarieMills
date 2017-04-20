@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {combineReducers} from 'redux';
 import courses from './courseReducer';
 import authors from './authorReducer';
@@ -30,3 +31,19 @@ const rootReducer = combineReducers({
 });
 
 export default rootReducer;
+=======
+import {combineReducers} from 'redux';
+import courses from './courseReducer';
+import authors from './authorReducer';
+import navbar_items from './navbarReducer';
+import blogs from './blogReducer'
+
+const rootReducer = combineReducers({
+  courses,
+  authors,
+  navbar_items,
+  blogs
+});
+
+export default rootReducer;
+>>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596
