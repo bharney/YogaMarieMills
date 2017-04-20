@@ -1,13 +1,12 @@
 import express from 'express';
 import sql from 'mssql';
-import secret from '../../secrets';
+import {secret, dbconfig} from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
 
 let scheduleRoutes = function () {
 
     const scheduleRouter = express.Router();
-    const dbconfig = "mssql://Application:!Testing123@BPHSERVER/YogaMarieMills";
 
     scheduleRouter.route('/schedules')
 

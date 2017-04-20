@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // For info about this file refer to webpack and webpack-hot-middleware documentation
 // For info on how we're generating bundles with hashed filenames for cache busting: https://medium.com/@okonetchnikov/long-term-caching-of-static-assets-with-webpack-1ecb139adb95#.w99i89nsz
 import webpack from 'webpack';
@@ -6,8 +5,6 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import WebpackMd5Hash from 'webpack-md5-hash';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import autoprefixer from 'autoprefixer';
-import PurifyCSSPlugin from 'purifycss-webpack';
-import glob from 'glob';
 import path from 'path';
 
 const GLOBALS = {
@@ -20,7 +17,7 @@ export default {
     extensions: ['*', '.js', '.jsx', '.json']
   },
   devtool: 'source-map', // more info:https://webpack.github.io/docs/build-performance.html#sourcemaps and https://webpack.github.io/docs/configuration.html#devtool
-  entry: [path.resolve(__dirname, 'src/index'),'whatwg-fetch'],
+  entry: path.resolve(__dirname, 'src/index'),
   target: 'web', // necessary per https://webpack.github.io/docs/testing.html#compile-and-test
   output: {
     path: path.resolve(__dirname, 'dist-server'),
@@ -72,10 +69,6 @@ export default {
         context: '/',
         postcss: () => [autoprefixer],
       }
-    }),
-    new PurifyCSSPlugin({
-      // Give paths to parse for rules. These should be absolute!
-      paths: glob.sync(path.join(__dirname, 'app/*.html')),
     })
   ],
   module: {
@@ -93,51 +86,4 @@ export default {
       { test: /\.json$/, loader: "json-loader" }
     ]
   }
-=======
-import webpack from 'webpack';
-import path from 'path';
-import autoprefixer from 'autoprefixer';
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
-
-const GLOBALS = {
-  'process.env.NODE_ENV': JSON.stringify('production')
-};
-
-export default {
-  debug: true,
-  devtool: 'source-map',
-  noInfo: false,
-  entry: './src/index',
-  target: 'web',
-  output: {
-    path: __dirname + '/dist', // Note: Physical files are only output by the production build task `npm run build`.
-    publicPath: '/',
-    filename: 'bundle.js'
-  },
-  devServer: {
-    contentBase: './dist'
-  },
-  plugins: [
-    new webpack.optimize.OccurenceOrderPlugin(),
-    new webpack.DefinePlugin(GLOBALS),
-    new ExtractTextPlugin('styles.css'),
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.UglifyJsPlugin()
-  ],
-  module: {
-    loaders: [
-      {test: /\.js$/, include: path.join(__dirname, 'src'), loaders: ['babel']},
-      { test: /(\.css|\.scss)$/, loader: ExtractTextPlugin.extract('css?sourceMap!postcss!sass?sourceMap') },
-      { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: "file" },
-      { test: /\.ico$/, loader: 'file?name=[name].[ext]' },
-      { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url?limit=10000&mimetype=application/font-woff' },
-      { test: /\.[ot]tf(\?v=\d+.\d+.\d+)?$/, loader: 'url?limit=10000&mimetype=application/octet-stream' },
-      { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/octet-stream" },
-      { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=image/svg+xml" },
-      { test: /\.(jpe?g|png|gif)$/i, loader: 'file?name=[name].[ext]' },
-      { test: /\.json$/, loader: "json" }
-    ]
-  },
-  postcss: () => [autoprefixer]
->>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596
 };

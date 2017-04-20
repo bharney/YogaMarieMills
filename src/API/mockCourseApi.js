@@ -57,11 +57,7 @@ const generateId = (course) => {
 
 class CourseApi {
   static getAllCourses() {
-<<<<<<< HEAD
     return new Promise((resolve) => {
-=======
-    return new Promise((resolve, reject) => {
->>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596
       setTimeout(() => {
         resolve(Object.assign([], courses));
       }, delay);
@@ -96,11 +92,7 @@ class CourseApi {
   }
 
   static deleteCourse(courseId) {
-<<<<<<< HEAD
     return new Promise((resolve) => {
-=======
-    return new Promise((resolve, reject) => {
->>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596
       setTimeout(() => {
         const indexOfCourseToDelete = courses.findIndex(course => {
           course.courseId == courseId;

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import {createStore, compose, applyMiddleware} from 'redux';
 import reduxImmutableStateInvariant from 'redux-immutable-state-invariant';
 import thunk from 'redux-thunk';
@@ -51,11 +50,3 @@ function configureStoreDev(initialState) {
 const configureStore = process.env.NODE_ENV === 'production' ? configureStoreProd : configureStoreDev;
 
 export default configureStore;
-=======
-if (process.env.NODE_ENV === 'production') {
-  module.exports = require('./configureStore.prod');
-}
-else {
-  module.exports = require('./configureStore.dev');
-}
->>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596

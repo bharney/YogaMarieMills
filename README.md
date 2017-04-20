@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <p align="center"><img src="https://cloud.githubusercontent.com/assets/3129129/22811426/bb69dc06-ef0c-11e6-8092-a0bea9060b35.png"/></p>
 
 [![Build status: Linux](https://img.shields.io/travis/coryhouse/react-slingshot.svg?style=flat-square)](https://travis-ci.org/coryhouse/react-slingshot)
@@ -76,15 +75,3 @@ Slingshot offers a rich development experience using the following technologies:
 The starter kit includes a working example app that puts all of the above to use.
 ## Questions?
 Check out the [FAQ](/docs/FAQ.md)
-=======
-# YogaMarieMills
-Forked version of coryhouse/react-slingshot. Project for dynamically bringing in data onto the page via API.
-
-Project is a work in process. The end goal is to create a word-press like application, using Reactjs. The start was based on my dear ol' aunt having a crummy word press site which didn't look so great. This site will ultimately allow non-technical users to customize their content and display that data into a template.
-
-Get started:
-
-Using the package.json file you should be able to npm install. 
-
-Once you have all of the dependencies, use npm start to kick it off.
->>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596

@@ -1,13 +1,12 @@
 import express from 'express';
 import sql from 'mssql';
-import secret from '../../secrets';
+import {secret, dbconfig} from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
 
 let classTypeRoutes = function () {
 
     const classTypeRouter = express.Router();
-    const dbconfig = "mssql://Application:!Testing123@BPHSERVER/YogaMarieMills";
 
     classTypeRouter.route('/classTypes')
         .post(function (req, res) {

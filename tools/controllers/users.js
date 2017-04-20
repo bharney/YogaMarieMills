@@ -1,14 +1,13 @@
 import express from 'express';
 import sql from 'mssql';
 import bcrypt from 'bcrypt-nodejs';
-import secret from '../../secrets';
+import {secret, dbconfig} from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
 
 let userRoutes = function () {
 
     const userRouter = express.Router();
-    const dbconfig = "mssql://Application:!Testing123@BPHSERVER/YogaMarieMills";
 
     function encryptPassword(password) {
         console.log("password: " + password);

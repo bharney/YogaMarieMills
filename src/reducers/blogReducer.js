@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿import initialState from './initialState';
 
 export default function blogReducer(state = initialState.blogs, action) {
@@ -25,16 +24,3 @@ export default function blogReducer(state = initialState.blogs, action) {
             return state;
     }
 }
-=======
-﻿import initialState from './initialState';
-
-export default function blogReducer(state = initialState.blogs, action) {
-    switch (action.type) {
-        case 'LOAD_BLOG_SUCCESS':
-            return action.blogs;
-
-        default:
-            return state;
-    }
-}
->>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596

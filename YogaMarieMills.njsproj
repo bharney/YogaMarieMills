@@ -1,0 +1,212 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5707ceeb-4273-497b-8a10-03230a3ba3b9}</ProjectGuid>
+    <ProjectHome />
+    <ProjectView>ShowAllFiles</ProjectView>
+    <StartupFile>webpack.config.dev.js</StartupFile>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include="package.json" />
+    <Compile Include="src\actions\blogActions.js" />
+    <Compile Include="src\actions\navbarActions.js" />
+    <Compile Include="src\API\mockBlogApi.js" />
+    <Compile Include="src\API\mockNavbarApi.js" />
+    <Compile Include="src\components\blog\Blog.js" />
+    <Compile Include="src\components\blog\BlogPage.js" />
+    <Compile Include="src\components\common\Navbar.js" />
+    <Compile Include="src\components\common\SocialMediaBar.js" />
+    <Compile Include="src\components\contemporary\ContemporaryPage.js" />
+    <Compile Include="src\components\yogathurles\YogaThurlesPage.js" />
+    <Compile Include="src\reducers\blogReducer.js" />
+    <Compile Include="src\reducers\navbarReducer.js" />
+    <Compile Include="webpack.config.dev.js" />
+    <Compile Include="webpack.config.prod.js" />
+    <Content Include="dist-server\index.html" />
+    <Content Include="dist-server\styles.css" />
+    <Content Include="dist-server\89889688147bd7575d6327160d64e760.svg" />
+    <Compile Include="dist-server\bundle.js" />
+    <Content Include="src\images\ChicagoInABoxAfter.jpg" />
+    <Content Include="src\images\CircleHead.png" />
+    <Content Include="src\images\ColetteMillsAfter.jpg" />
+    <Content Include="src\images\GoSurferAfter.jpg" />
+    <Content Include="src\images\JMS.jpg" />
+    <Content Include="src\images\landing.jpg" />
+    <Content Include="src\images\MeetBrianAfter.jpg" />
+    <Content Include="src\index.html" />
+    <Compile Include="src\index.js" />
+    <Compile Include="src\routes.js" />
+    <Compile Include="tools\build.js" />
+    <Compile Include="tools\buildHtml.js" />
+    <Compile Include="tools\distServer.js" />
+    <Compile Include="tools\srcServer.js" />
+    <Compile Include="tools\startMessage.js" />
+    <Compile Include="src\actions\authorActions.js" />
+    <Compile Include="src\actions\courseActions.js" />
+    <Compile Include="src\API\delay.js" />
+    <Compile Include="src\API\mockAuthorApi.js" />
+    <Compile Include="src\API\mockCourseApi.js" />
+    <Compile Include="src\components\App.js" />
+    <Compile Include="src\reducers\authorReducer.js" />
+    <Compile Include="src\reducers\courseReducer.js" />
+    <Compile Include="src\reducers\index.js" />
+    <Compile Include="src\reducers\initialState.js" />
+    <Compile Include="src\store\configureStore.dev.js" />
+    <Compile Include="src\store\configureStore.js" />
+    <Compile Include="src\store\configureStore.prod.js" />
+    <Content Include="src\styles\styles.scss" />
+    <Compile Include="src\components\about\AboutPage.js" />
+    <Compile Include="src\components\common\Header.js" />
+    <Compile Include="src\components\common\SelectInput.js" />
+    <Compile Include="src\components\common\TextInput.js" />
+    <Compile Include="src\components\course\CourseForm.js" />
+    <Compile Include="src\components\course\CourseList.js" />
+    <Compile Include="src\components\course\CourseListRow.js" />
+    <Compile Include="src\components\course\CoursesPage.js" />
+    <Compile Include="src\components\course\ManageCoursePage.js" />
+    <Compile Include="src\components\home\HomePage.js" />
+    <Compile Include="src\components\schedule\SchedulePage.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="dist" />
+    <Folder Include="src" />
+    <Folder Include="src\actions" />
+    <Folder Include="src\API" />
+    <Folder Include="src\components" />
+    <Folder Include="src\components\about" />
+    <Folder Include="src\components\common" />
+    <Folder Include="src\components\course" />
+    <Folder Include="src\components\home" />
+    <Folder Include="src\components\contemporary\" />
+    <Folder Include="src\components\blog\" />
+    <Folder Include="src\components\yogathurles\" />
+    <Folder Include="src\components\schedule" />
+    <Folder Include="src\reducers" />
+    <Folder Include="src\store" />
+    <Folder Include="src\styles" />
+    <Folder Include="src\images\" />
+    <Folder Include="tools" />
+    <Folder Include="typings\" />
+    <Folder Include="typings\globals\" />
+    <Folder Include="typings\globals\babel-core\" />
+    <Folder Include="typings\globals\bootstrap\" />
+    <Folder Include="typings\globals\chai\" />
+    <Folder Include="typings\globals\colors\" />
+    <Folder Include="typings\globals\compression\" />
+    <Folder Include="typings\globals\enzyme\" />
+    <Folder Include="typings\globals\expect\" />
+    <Folder Include="typings\globals\express\" />
+    <Folder Include="typings\globals\html-webpack-plugin\" />
+    <Folder Include="typings\globals\jquery\" />
+    <Folder Include="typings\globals\jsdom\" />
+    <Folder Include="typings\globals\material-ui\" />
+    <Folder Include="typings\globals\mocha\" />
+    <Folder Include="typings\globals\nock\" />
+    <Folder Include="typings\globals\node\" />
+    <Folder Include="typings\globals\object-assign\" />
+    <Folder Include="typings\globals\open\" />
+    <Folder Include="typings\globals\react-addons-test-utils\" />
+    <Folder Include="typings\globals\react-bootstrap\" />
+    <Folder Include="typings\globals\react-dom\" />
+    <Folder Include="typings\globals\react-redux\" />
+    <Folder Include="typings\globals\react-router-redux\" />
+    <Folder Include="typings\globals\react-router\" />
+    <Folder Include="typings\globals\react\" />
+    <Folder Include="typings\globals\redux-immutable-state-invariant\" />
+    <Folder Include="typings\globals\redux-mock-store\" />
+    <Folder Include="typings\globals\redux-thunk\" />
+    <Folder Include="typings\globals\redux\" />
+    <Folder Include="typings\globals\rimraf\" />
+    <Folder Include="typings\globals\sinon\" />
+    <Folder Include="typings\globals\toastr\" />
+    <Folder Include="typings\globals\typescript\" />
+    <Folder Include="typings\globals\webpack\" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="typings\globals\babel-core\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\bootstrap\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\chai\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\colors\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\compression\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\enzyme\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\expect\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\express\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\html-webpack-plugin\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\jquery\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\jsdom\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\material-ui\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\mocha\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\nock\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\node\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\object-assign\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\open\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\react-addons-test-utils\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\react-bootstrap\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\react-dom\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\react-redux\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\react-router-redux\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\react-router\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\react\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\redux-immutable-state-invariant\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\redux-mock-store\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\redux-thunk\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\redux\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\rimraf\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\sinon\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\toastr\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\typescript\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\webpack\index.d.ts" />
+    <TypeScriptCompile Include="typings\index.d.ts" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

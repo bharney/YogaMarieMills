@@ -1,6 +1,6 @@
 import express from 'express';
 import sql from 'mssql';
-import secret from '../../secrets';
+import {secret, dbconfig} from '../../secrets';
 import jwt from 'jwt-simple';
 import bcrypt from 'bcrypt-nodejs';
 import moment from 'moment';
@@ -8,7 +8,6 @@ import moment from 'moment';
 let loginRoutes = function () {
 
     const loginRouter = express.Router();
-    const dbconfig = "mssql://Application:!Testing123@BPHSERVER/YogaMarieMills";
 
     function createToken(user, res, req) {
         delete user.password;

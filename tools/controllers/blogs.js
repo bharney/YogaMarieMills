@@ -1,13 +1,12 @@
 import express from 'express';
 import sql from 'mssql';
-import secret from '../../secrets';
+import {secret, dbconfig} from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
 
 let blogRoutes = function () {
 
     const blogRouter = express.Router();
-    const dbconfig = "mssql://Application:!Testing123@BPHSERVER/YogaMarieMills";
 
     blogRouter.route('/blogs')
         .post(function (req, res) {

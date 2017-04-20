@@ -1,0 +1,2 @@
+C:\Users\porkchop.BPHSERVER\Dropbox\GitHub\YogaMarieMills\obj\Debug\YogaMarieMills.njsprojResolveAssemblyReference.cache
+C:\Users\porkchop.BPHSERVER\Dropbox\GitHub\YogaMarieMills\bin\Microsoft.NodejsTools.WebRole.dll

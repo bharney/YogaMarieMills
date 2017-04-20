@@ -3,10 +3,7 @@
 /*eslint-disable no-console */
 import webpack from 'webpack';
 import webpackConfig from '../webpack.config.prod';
-<<<<<<< HEAD
 /*eslint-disable no-unused-vars */
-=======
->>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596
 import colors from 'colors';
 
 process.env.NODE_ENV = 'production'; // this assures the Babel dev config (for hot reloading) doesn't apply.

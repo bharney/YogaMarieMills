@@ -28,11 +28,7 @@ const generateId = (author) => {
 
 class AuthorApi {
   static getAllAuthors() {
-<<<<<<< HEAD
     return new Promise((resolve) => {
-=======
-    return new Promise((resolve, reject) => {
->>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596
       setTimeout(() => {
         resolve(Object.assign([], authors));
       }, delay);
@@ -70,11 +66,7 @@ class AuthorApi {
   }
 
   static deleteAuthor(authorId) {
-<<<<<<< HEAD
     return new Promise((resolve) => {
-=======
-    return new Promise((resolve, reject) => {
->>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596
       setTimeout(() => {
         const indexOfAuthorToDelete = authors.findIndex(author => {
           author.authorId == authorId;

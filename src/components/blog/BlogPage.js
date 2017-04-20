@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
@@ -113,18 +112,3 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(BlogPage);
-=======
-﻿import React, {PropTypes} from 'react';
-
-class BlogPage extends React.Component {
-    render() {
-        return (
-            <div>
-                Blog Here!
-            </div>
-        );
-    }
-}
-
-export default BlogPage;
->>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596

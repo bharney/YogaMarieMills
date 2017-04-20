@@ -1,13 +1,12 @@
 import express from 'express';
 import sql from 'mssql';
-import secret from '../../secrets';
+import {secret, dbconfig} from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
 
 let testimonialRoutes = function () {
 
     const testimonialRouter = express.Router();
-    const dbconfig = "mssql://Application:!Testing123@BPHSERVER/YogaMarieMills";
 
     testimonialRouter.route('/testimonials')
         .post(function (req, res) {

@@ -1,16 +1,9 @@
-<<<<<<< HEAD
 import express from 'express';
-=======
-﻿import express from 'express';
->>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596
 import webpack from 'webpack';
 import path from 'path';
 import config from '../webpack.config.dev';
 import open from 'open';
-<<<<<<< HEAD
 import bodyParser from 'body-parser';
-=======
->>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596
 
 /* eslint-disable no-console */
 
@@ -25,7 +18,6 @@ app.use(require('webpack-dev-middleware')(compiler, {
 
 app.use(require('webpack-hot-middleware')(compiler));
 
-<<<<<<< HEAD
 app.use(bodyParser.urlencoded({ express: true }));
 app.use(bodyParser.json());
 
@@ -59,12 +51,6 @@ app.get('*', function (req, res) {
     res.sendFile(path.join(__dirname, '../src/index.html'));
 });
  
-=======
-app.get('*', function (req, res) {
-    res.sendFile(path.join(__dirname, '../src/index.html'));
-});
-
->>>>>>> ee298d412f7c57384fc49ab52017ec591ac91596
 app.listen(port, function (err) {
     if (err) {
         console.log(err);
