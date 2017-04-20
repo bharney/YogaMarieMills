@@ -3,8 +3,15 @@ import courses from './courseReducer';
 import authors from './authorReducer';
 import navbar_items from './navbarReducer';
 import blogs from './blogReducer';
-import schedules from './scheduleReducer'
-import costs from './costReducer'
+import schedules from './scheduleReducer';
+import costs from './costReducer';
+import classTypes from './classTypesReducer';
+import dietConsultations from './dietConsultationReducer';
+import massageTypes from './massageReducer';
+import eventTypes from './eventReducer';
+import testimonials from './testimonialReducer';
+import upload from './uploadReducer';
+import authToken from './authTokenReducer';
 
 const rootReducer = combineReducers({
   courses,
@@ -12,7 +19,14 @@ const rootReducer = combineReducers({
   navbar_items,
   blogs,
   schedules,
-  costs
+  costs,
+  classTypes,
+  dietConsultations,
+  massageTypes,
+  testimonials,
+  eventTypes,
+  upload,
+  authToken
 });
 
 export default rootReducer;

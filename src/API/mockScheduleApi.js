@@ -1,56 +1,86 @@
-const schedules = [
-  {
-    id: 1,
-    session_date: "Tuesday January 10, 2017",
-    href: "http://www.yogamariemills/About/",
-    route: "about",
-    session_details: [
-      {
-        id: 1,
-        session_time: "10:00 AM - 11:00 AM",
-        class: "Hatha Yoga"
-      },
-      {
-        id: 2,
-        session_time: "10:00 AM - 11:00 AM",
-        class: "Hatha Yoga"
-      },
-      {
-        id: 3,
-        session_time: "10:00 AM - 11:00 AM",
-        class: "Hatha Yoga"
-      },
-    ]
-  },
-  {
-    id: 2,
-    session_date: "Wednesday January 11, 2017",
-    href: "http://www.yogamariemills/About/",
-    route: "about",
-    session_details: [
-      {
-        id: 1,
-        session_time: "10:00 AM - 11:00 AM",
-        class: "Mens Yoga"
-      },
-      {
-        id: 2,
-        session_time: "11:00 AM - 12:00 PM",
-        class: "Mens Yoga"
-      },
-      {
-        id: 3,
-        session_time: "12:00 AM - 1:00 PM",
-        class: "Mens Yoga"
-      },
-    ]
-  }
-];
+import 'whatwg-fetch'
+import { getToken } from '../actions/authTokenActions';
 
 class ScheduleApi {
   static getAllItems() {
-    return new Promise((resolve, reject) => {
-      resolve(Object.assign([], schedules));
+    return new Promise((resolve) => {
+      fetch('http://localhost:3000/api/schedules').then(function (response) {
+        return response.json();
+      }).then(function (schedules) {
+        resolve(Object.assign([], schedules));
+      });
+    });
+  }
+
+  static getItem(scheduleId) {
+    return new Promise((resolve) => {
+      if (scheduleId) {
+        fetch('http://localhost:3000/api/schedules/' + scheduleId).then(function (response) {
+          return response.json();
+        }).then(function (schedules) {
+          resolve(Object.assign([], schedules));
+        });
+      }
+    });
+  }
+
+  static saveSchedule(schedule) {
+    schedule = Object.assign({}, schedule);
+    return new Promise((resolve) => {
+      if (schedule.id) {
+        fetch('http://localhost:3000/api/schedules', {
+          method: 'put',
+          headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+          },
+          body: JSON.stringify(schedule)
+        }).then(function (response) {
+          return response.json();
+        }).then(function (schedule) {
+          resolve(schedule)
+        }).catch(function (error) {
+          console.log('Request failed', error);
+        });
+      } else {
+        fetch('http://localhost:3000/api/schedules', {
+          method: 'post',
+          headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+          },
+          body: JSON.stringify(schedule)
+        }).then(function (response) {
+          return response.json();
+        }).then(function (schedule) {
+          resolve(schedule)
+        }).catch(function (error) {
+          console.log('Request failed', error);
+        });
+      }
+    });
+  }
+
+  static deleteSchedule(scheduleId) {
+    return new Promise((resolve) => {
+      if (confirm("Are you sure you want to delete this schedule forever?")) {
+        if (scheduleId) {
+          fetch('http://localhost:3000/api/schedules/' + scheduleId, {
+            method: 'delete',
+            headers: {
+              'Accept': 'application/json, text/plain, */*',
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + getToken()
+            }
+          }).then(function () {
+            resolve(console.log("schedule deleted."));
+          }).catch(function (error) {
+            console.log('Delete failed', error);
+          });
+        }
+      }
     });
   }
 }

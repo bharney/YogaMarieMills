@@ -1,8 +1,33 @@
-﻿{
-  "presets": ["react", "es2015"],
+{
+  "presets": [
+    "react",
+    "stage-1"
+  ],
   "env": {
     "development": {
-      "presets": ["react-hmre"]
+      "presets": [
+        "latest",
+        "react-hmre"
+      ]
+    },
+    "production": {
+      "presets": [
+        ["latest", {
+          "es2015": {
+            "modules": false
+          }
+        }]
+      ],
+      "plugins": [
+        "transform-react-constant-elements",
+        "transform-react-remove-prop-types"
+      ]
+    },
+    "test": {
+      "presets": [
+        "latest"
+      ]
     }
   }
 }
+

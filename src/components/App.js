@@ -1,16 +1,15 @@
 import React, { PropTypes } from 'react';
 import Header from './common/Header';
 
-
 class App extends React.Component {
     constructor(props) {
         super(props);
     }
     render() {
         return (
-            <div className="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+            <div>
                 <Header />
-                <main className="mdl-layout__content">
+                <main>
                     {this.props.children}
                 </main>
             </div>

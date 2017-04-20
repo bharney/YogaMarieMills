@@ -5,4 +5,15 @@ export default {
   blogs: [],
   schedules: [],
   costs: [],
+  classTypes: [],
+  dietConsultations: [],
+  massageTypes: [],
+  testimonials: [],
+  eventTypes: [],
+  upload: [],
+  authToken: {
+    token: null,
+    user: null
+  },
+  error: ""
 }
