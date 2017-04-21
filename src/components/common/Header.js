@@ -109,7 +109,7 @@ class Header extends React.Component {
                     <div className="mdl-layout-spacer nav-vertical-divider">
                         <div className="mdl-layout__header-row drawer-header anchor p-l-0">
                             <IndexLink to="/" className="mdl-layout-title nav-links p-r-1-em">
-                                <h2 className="brand-text m-0">Yoga Marie Mills</h2>
+                                <h2 className="brand-text m-0 p-l-03-em">Yoga Marie Mills</h2>
                             </IndexLink>
                         </div>
                     </div>
