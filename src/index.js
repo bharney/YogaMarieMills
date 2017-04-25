@@ -22,7 +22,7 @@ import MuiThemeProvider from '../node_modules/material-ui/styles/MuiThemeProvide
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import 'draft-js-inline-toolbar-plugin/lib/plugin.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'font-awesome/scss/font-awesome.scss';
+import 'font-awesome/css/font-awesome.css';
 import 'material-design-lite/material.js';
 import 'material-design-lite/material.css';
 import './styles/styles.scss';
