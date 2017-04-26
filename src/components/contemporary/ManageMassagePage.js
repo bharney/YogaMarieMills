@@ -71,7 +71,8 @@ class ManageMassagePage extends React.Component {
     this.context.router.push('/Ayurveda/Massage/' + this.state.massage.type);
   }
 
-  addRow() {
+  addRow(e) {
+    e.preventDefault();
     let massage = this.state.massage;
     massage.massage_details.push({ id:'', title: '', description: '' })
     this.setState({ massage });

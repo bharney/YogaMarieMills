@@ -102,7 +102,8 @@ class ManageTestimonialPage extends React.Component {
     this.context.router.push('/Ayurveda/Testimonials');
   }
 
-  addRow() {
+  addRow(e) {
+    e.preventDefault();
     let testimonial = this.state.testimonial;
     testimonial.testimonial_details.push({
       id: '',

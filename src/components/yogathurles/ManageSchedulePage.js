@@ -64,7 +64,8 @@ class ManageSchedulePage extends React.Component {
     this.context.router.push('/YogaThurles/Schedule');
   }
 
-  addRow() {
+  addRow(e) {
+    e.preventDefault();
     let schedule = this.state.schedule;
     schedule.session_details.push({ id: '', session_time: '', class: '' })
     this.setState({ schedule });

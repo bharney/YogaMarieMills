@@ -127,7 +127,8 @@ class ManageDietConsultationPage extends React.Component {
     this.context.router.push('/Ayurveda/DietConsultation');
   }
 
-  addRow() {
+  addRow(e) {
+    e.preventDefault();
     let dietConsultation = this.state.dietConsultation;
     dietConsultation.consultationDetails.push({
       id: '',
