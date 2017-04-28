@@ -1,4 +1,3 @@
-import 'whatwg-fetch'
 import { getToken } from '../actions/authTokenActions';
 
 class ScheduleApi {

@@ -1,4 +1,3 @@
-import 'whatwg-fetch'
 
 class LoginApi {
     static loginRequest(login) {

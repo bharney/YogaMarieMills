@@ -3,10 +3,9 @@ import TextInput from '../common/TextInput';
 import Admin from '../common/Admin';
 import DatePicker from 'material-ui/DatePicker';
 import Editor from 'draft-js-plugins-editor';
-import IntlPolyfill from 'intl';
-import 'intl/locale-data/jsonp/en.js'
-Intl.NumberFormat   = IntlPolyfill.NumberFormat;
-Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
+import 'intl';
+import 'intl/locale-data/jsonp/en.js';
+
 import createInlineToolbarPlugin from 'draft-js-inline-toolbar-plugin';
 import {
   ItalicButton,

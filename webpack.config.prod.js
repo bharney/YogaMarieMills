@@ -25,6 +25,10 @@ export default {
     filename: '[name].[chunkhash].js'
   },
   plugins: [
+    new webpack.ProvidePlugin({
+          Promise: 'imports-loader?this=>global!exports-loader?global.Promise!es6-promise',
+          fetch: 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'
+     }),
     // Hash the files using MD5 so that their names change when the content changes.
     new WebpackMd5Hash(),
 

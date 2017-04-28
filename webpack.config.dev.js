@@ -27,6 +27,10 @@ export default {
       __DEV__: true
     }),
     new webpack.HotModuleReplacementPlugin(),
+    new webpack.ProvidePlugin({
+          Promise: 'imports-loader?this=>global!exports-loader?global.Promise!es6-promise',
+          fetch: 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'
+     }),
     new webpack.NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({     // Create HTML file that includes references to bundled CSS and JS.
       template: 'src/index.ejs',
