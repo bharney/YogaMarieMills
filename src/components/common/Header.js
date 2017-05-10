@@ -6,6 +6,7 @@ import * as navbarActions from '../../actions/navbarActions';
 import MenuItem from 'material-ui/MenuItem';
 import Drawer from 'material-ui/Drawer';
 import { ListItem } from 'material-ui/List';
+import {Nav, NavItem, NavDropdown} from 'react-bootstrap';
 import logoImg from '../../images/mobileLogo.png';
 
 class Header extends React.Component {
@@ -78,27 +79,20 @@ class Header extends React.Component {
         };
         let subMenuItems = function (item) {
             return (
-                <Link key={item.route} to={'/' + item.route} >
-                    <li className="mdl-menu__item">{item.name}</li>
-                </Link>
+                <NavItem eventKey={item.id} justified href={'/' + item.route} className="nav-links p-l-1-em p-r-1-em">{item.name}</NavItem>
             );
         };
         let navItems = function (item) {
             if (item.subMenu.length > 0) {
                 return (
-                    <div className="hover" id={item.name}>
-                        <Link key={item.route} to="" onClick={that.preventRedirect} className="mdl-tabs__tab nav-links p-l-1-em p-r-1-em hidden-xs hidden-sm">
-                            {item.name} &nbsp;<span className="caret" aria-hidden="true"></span>
-                        </Link>
-                        <ul className="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" htmlFor={item.name}>
-                            {item.subMenu.map(subMenu => subMenuItems(subMenu))}
-                        </ul>
-                    </div>
+                    <NavDropdown eventKey={item.id} pullRight={true} className="nav-links hidden-xs hidden-sm" title={item.name} id={item.id}>
+                        {item.subMenu.map(subMenu => subMenuItems(subMenu))}
+                    </NavDropdown>
                 );
             }
             else {
                 return (
-                    <Link key={item.route} to={'/' + item.route} className="mdl-tabs__tab nav-links p-l-1-em p-r-1-em hidden-xs hidden-sm">{item.name}</Link>
+                    <NavItem eventKey={item.id} justified href={'/' + item.route} className="nav-links p-l-1-em p-r-1-em hidden-xs hidden-sm">{item.name}</NavItem>
                 );
             }
         };
@@ -113,9 +107,11 @@ class Header extends React.Component {
                             </IndexLink>
                         </div>
                     </div>
-                    {navbar_items.map(item =>
-                        navItems(item)
-                    )}
+                    <Nav bsStyle="tabs" activeKey="1" onSelect={this.handleClose}>
+                        {navbar_items.map(item =>
+                            navItems(item)
+                        )}
+                    </Nav>
                 </div>
                 <Drawer
                     docked={false}

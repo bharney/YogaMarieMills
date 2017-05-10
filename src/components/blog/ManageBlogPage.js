@@ -16,17 +16,13 @@ class ManageBlogPage extends React.Component {
         component: TokenSpan,
       },
     ]);
-
-    let blocks = convertFromRaw(blocks = { blocks: [{ text: '', type: 'unstyled', },], entityMap: { first: { type: 'TOKEN', mutability: 'MUTABLE', }, } });
+    let editorState = editorStateFromText("");
     if (props.blog.description != "")
-      blocks = convertFromRaw(JSON.parse(props.blog.description));
+      editorState = editorStateFromRaw(JSON.parse(props.blog.description));
 
     this.state = {
       blog: Object.assign({}, props.blog),
-      editorState: EditorState.createWithContent(
-        blocks,
-        decorator,
-      ),
+      editorState: editorState,
     };
 
     this.onChange = this.onChange.bind(this);
@@ -41,8 +37,8 @@ class ManageBlogPage extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.blog.id != nextProps.blog.id) {
       this.setState({ blog: Object.assign({}, nextProps.blog) });
-      const blocks = convertFromRaw(JSON.parse(nextProps.blog.description));
-      const editorState = EditorState.push(this.state.editorState, blocks);
+      debugger;
+      const editorState = editorStateFromRaw(JSON.parse(nextProps.blog.description));
       this.setState({ editorState });
 
     }
@@ -126,7 +122,6 @@ class ManageBlogPage extends React.Component {
         deleteBlog={this.deleteBlog}
         blog={this.state.blog}
         editorState={this.state.editorState}
-        ref="editor"
         focus={focus}
         errors={this.state.errors}
         saving={this.state.saving}
