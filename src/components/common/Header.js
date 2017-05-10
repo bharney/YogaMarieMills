@@ -6,7 +6,7 @@ import * as navbarActions from '../../actions/navbarActions';
 import MenuItem from 'material-ui/MenuItem';
 import Drawer from 'material-ui/Drawer';
 import { ListItem } from 'material-ui/List';
-import {Nav, NavItem, NavDropdown} from 'react-bootstrap';
+import { Nav, NavItem, NavDropdown } from 'react-bootstrap';
 import logoImg from '../../images/mobileLogo.png';
 
 class Header extends React.Component {
@@ -34,8 +34,8 @@ class Header extends React.Component {
         return (<div key={index}>{item.name}</div>);
     }
 
-    redirectToNavbarItemPage() {
-        browserHistory.push(`/ {item.name}`);
+    redirectToNavbarItemPage(item) {
+        browserHistory.push(`/${item.route}`);
     }
 
     preventRedirect(e) {
@@ -47,54 +47,38 @@ class Header extends React.Component {
             fontWeight: 300
         }
         const { navbar_items } = this.props;
-
         let that = this;
-        let listItems = function (item) {
-            return (
-                <Link key={item.route} to={'/' + item.route} >
-                    <ListItem nestedLevel={1} key={item.name} onTouchTap={that.handleToggle} primaryText={item.name} />
-                </Link>
-            );
-        };
+
         let drawerItems = function (item) {
-            if (item.subMenu.length > 0) {
-                return (
-                    <ListItem
-                        primaryText={item.name}
-                        initiallyOpen={false}
-                        style={styles}
-                        primaryTogglesNestedList
-                        nestedItems={[
-                            item.subMenu.map(subMenu => listItems(subMenu))
-                        ]} />
-                );
-            }
-            else {
+            if (!item.subMenu || item.subMenu.length == 0)
                 return (
                     <Link key={item.route} to={'/' + item.route} >
                         <MenuItem onTouchTap={that.handleToggle} key={item.route}>{item.name}</MenuItem>
                     </Link>
                 );
-            }
-        };
-        let subMenuItems = function (item) {
+
             return (
-                <NavItem eventKey={item.id} justified href={'/' + item.route} className="nav-links p-l-1-em p-r-1-em">{item.name}</NavItem>
+                <ListItem
+                    primaryText={item.name}
+                    initiallyOpen={false}
+                    style={styles}
+                    primaryTogglesNestedList
+                    nestedItems={[
+                        item.subMenu.map(subMenu => drawerItems(subMenu))
+                    ]} />
             );
         };
+
         let navItems = function (item) {
-            if (item.subMenu.length > 0) {
+            if (!item.subMenu || item.subMenu.length == 0)
                 return (
-                    <NavDropdown eventKey={item.id} pullRight={true} className="nav-links hidden-xs hidden-sm" title={item.name} id={item.id}>
-                        {item.subMenu.map(subMenu => subMenuItems(subMenu))}
-                    </NavDropdown>
+                    <NavItem eventKey={item.id} onTouchTap={() => that.redirectToNavbarItemPage(item)} className="dark-color nav-links hidden-xs hidden-sm">{item.name}</NavItem>
                 );
-            }
-            else {
-                return (
-                    <NavItem eventKey={item.id} justified href={'/' + item.route} className="nav-links p-l-1-em p-r-1-em hidden-xs hidden-sm">{item.name}</NavItem>
-                );
-            }
+            return (
+                <NavDropdown eventKey={item.id} pullRight={true} className="nav-links hidden-xs hidden-sm" title={item.name} id={item.id}>
+                    {item.subMenu.map(subMenu => navItems(subMenu))}
+                </NavDropdown>
+            );
         };
         return (
             <header>
@@ -107,8 +91,8 @@ class Header extends React.Component {
                             </IndexLink>
                         </div>
                     </div>
-                    <Nav bsStyle="tabs" activeKey="1" onSelect={this.handleClose}>
-                        {navbar_items.map(item =>
+                    <Nav bsStyle="" className="inline-nav" activeKey="1" onSelect={this.handleClose}>
+                        {navbar_items.filter(item => item.subMenu).map(item =>
                             navItems(item)
                         )}
                     </Nav>
@@ -128,7 +112,7 @@ class Header extends React.Component {
                             </IndexLink>
                         </div>
                     </header>
-                    <main className="nav">
+                    <main className="inline-nav">
                         {navbar_items.map(item =>
                             drawerItems(item)
                         )}
