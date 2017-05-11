@@ -2,35 +2,79 @@ import React from 'react';
 import TextInput from '../common/TextInput';
 import Admin from '../common/Admin';
 import { Link } from 'react-router';
-import Editor from 'draft-js-plugins-editor';
-import createInlineToolbarPlugin from 'draft-js-inline-toolbar-plugin';
-import {
-  ItalicButton,
-  BoldButton,
-  UnderlineButton,
-  HeadlineTwoButton,
-  HeadlineThreeButton,
-  UnorderedListButton,
-  OrderedListButton,
-  BlockquoteButton,
-} from 'draft-js-buttons';
+import Editor, { composeDecorators } from 'draft-js-plugins-editor';
 
-const inlineToolbarPlugin = createInlineToolbarPlugin({
-  structure: [
-    BoldButton,
-    ItalicButton,
-    UnderlineButton,
-    HeadlineTwoButton,
-    HeadlineThreeButton,
-    UnorderedListButton,
-    OrderedListButton,
-    BlockquoteButton,
-  ]
-});
+/* Emoji plugin */
+import createEmojiPlugin from 'draft-js-emoji-plugin'
+import 'draft-js-emoji-plugin/lib/plugin.css'
+const emojiPlugin = createEmojiPlugin()
+const { EmojiSuggestions } = emojiPlugin
 
-const plugins = [inlineToolbarPlugin];
+/* Hashtag plugin */
+import createHashtagPlugin from 'draft-js-hashtag-plugin'
+import 'draft-js-hashtag-plugin/lib/plugin.css'
+const hashtagPlugin = createHashtagPlugin()
 
-const { InlineToolbar } = inlineToolbarPlugin;
+/* Image with Alignment, dnd, focus, resize plugin */
+import createImagePlugin from 'draft-js-image-plugin'
+import createAlignmentPlugin from 'draft-js-alignment-plugin'
+import createFocusPlugin from 'draft-js-focus-plugin'
+import createResizeablePlugin from 'draft-js-resizeable-plugin'
+import createDndPlugin from 'draft-js-dnd-plugin'
+
+import 'draft-js-alignment-plugin/lib/plugin.css'
+import 'draft-js-focus-plugin/lib/plugin.css'
+
+const focusPlugin = createFocusPlugin()
+const resizeablePlugin = createResizeablePlugin()
+const dndPlugin = createDndPlugin()
+const alignmentPlugin = createAlignmentPlugin()
+const { AlignmentTool } = alignmentPlugin
+
+const decorator = composeDecorators(
+  resizeablePlugin.decorator,
+  alignmentPlugin.decorator,
+  focusPlugin.decorator,
+  dndPlugin.decorator
+)
+const imagePlugin = createImagePlugin({ decorator })
+
+/* Linkify */
+import createLinkifyPlugin from 'draft-js-linkify-plugin'
+import 'draft-js-linkify-plugin/lib/plugin.css'
+const linkifyPlugin = createLinkifyPlugin()
+
+/* ld plugins */
+
+/* Toolbar */
+import createToolbarPlugin from 'last-draft-js-toolbar-plugin'
+import 'last-draft-js-toolbar-plugin/lib/plugin.css'
+const toolbarPlugin = createToolbarPlugin()
+const { Toolbar } = toolbarPlugin
+
+/* Side Toolbar */
+import createSidebarPlugin from 'last-draft-js-sidebar-plugin'
+import 'last-draft-js-sidebar-plugin/lib/plugin.css'
+const sidebarPlugin = createSidebarPlugin()
+const { Sidebar } = sidebarPlugin
+
+/* Embed plugin */
+import createEmbedPlugin from 'draft-js-embed-plugin'
+import 'draft-js-embed-plugin/lib/plugin.css'
+const embedPlugin = createEmbedPlugin()
+
+/* Link plugin */
+import createLinkPlugin from 'draft-js-link-plugin'
+import 'draft-js-link-plugin/lib/plugin.css'
+const linkPlugin = createLinkPlugin()
+
+
+/* init the plugins */
+const plugins = [
+  dndPlugin, focusPlugin, alignmentPlugin, resizeablePlugin, imagePlugin,
+  emojiPlugin, hashtagPlugin, linkifyPlugin,
+  toolbarPlugin, sidebarPlugin, embedPlugin, linkPlugin
+]
 
 const BlogForm = ({authorized, updateBlogState, onChange, deleteBlog, saveBlog, blog, editorState, ref, focus, uploadImage, displayImage }) => {
 
@@ -71,7 +115,10 @@ const BlogForm = ({authorized, updateBlogState, onChange, deleteBlog, saveBlog, 
                         ref={ref}
                         plugins={plugins}
                       />
-                      <InlineToolbar />
+                      <AlignmentTool />
+                      <Toolbar />
+                      <Sidebar />
+                      <EmojiSuggestions />
                     </p>
                   </div>
                 </div>
