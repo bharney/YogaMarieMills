@@ -1,8 +1,6 @@
 import React from 'react';
 import DatePicker from 'material-ui/DatePicker';
 import TextInput from '../common/TextInput';
-import 'intl';
-import 'intl/locale-data/jsonp/en.js';
 import RemoveRowButton from '../common/RemoveRowButton';
 
 const ScheduleForm = ({updateClassState, updateDateState, updateScheduleTimeState, removeRow, schedule}) => {

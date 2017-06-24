@@ -24,10 +24,6 @@ import 'draft-js-inline-toolbar-plugin/lib/plugin.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.css';
 import 'material-design-lite/material.css';
-import './styles/ld.css';
-import './styles/example.css';
-import './styles/draft.css';
-import './styles/plugins.css';
 import './styles/styles.scss';
         
 injectTapEventPlugin();

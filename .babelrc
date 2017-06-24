@@ -20,8 +20,7 @@
       ],
       "plugins": [
         "transform-react-constant-elements",
-        "transform-react-remove-prop-types",
-        "intl"
+        "transform-react-remove-prop-types"
       ]
     },
     "test": {

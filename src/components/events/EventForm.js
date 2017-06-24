@@ -3,8 +3,6 @@ import TextInput from '../common/TextInput';
 import Admin from '../common/Admin';
 import DatePicker from 'material-ui/DatePicker';
 import Editor from 'draft-js-plugins-editor';
-import 'intl';
-import 'intl/locale-data/jsonp/en.js';
 
 import createInlineToolbarPlugin from 'draft-js-inline-toolbar-plugin';
 import {

@@ -6,10 +6,10 @@ import * as uploadActions from '../../actions/uploadActions';
 import BlogForm from './BlogForm';
 import { CompositeDecorator, EditorState, convertFromRaw, convertToRaw } from 'draft-js';
 
-
 class ManageBlogPage extends React.Component {
   constructor(props, context) {
     super(props, context);
+
     const decorator = new CompositeDecorator([
       {
         strategy: getEntityStrategy('MUTABLE'),
@@ -27,8 +27,6 @@ class ManageBlogPage extends React.Component {
         blocks,
         decorator,
       ),
-      errors: {},
-      saving: false
     };
 
     this.onChange = this.onChange.bind(this);
@@ -40,20 +38,19 @@ class ManageBlogPage extends React.Component {
     this.uploadImage = this.uploadImage.bind(this);
     this.displayImage = this.displayImage.bind(this);
   }
-
   componentWillReceiveProps(nextProps) {
     if (this.props.blog.id != nextProps.blog.id) {
       this.setState({ blog: Object.assign({}, nextProps.blog) });
       const blocks = convertFromRaw(JSON.parse(nextProps.blog.description));
       const editorState = EditorState.push(this.state.editorState, blocks);
       this.setState({ editorState });
+
     }
   }
 
   onChange(editorState) {
     this.setState({ editorState });
   }
-
 
   focus() {
     this.refs.editor.focus();
@@ -119,16 +116,17 @@ class ManageBlogPage extends React.Component {
 
 
   render() {
-    const { authorized } = this.props;
+    const {authorized} = this.props;
     return (
       <BlogForm
-        authorized={authorized}
+      authorized={authorized}
         updateBlogState={this.updateBlogState}
         onChange={this.onChange}
         saveBlog={this.saveBlog}
         deleteBlog={this.deleteBlog}
         blog={this.state.blog}
         editorState={this.state.editorState}
+        ref="editor"
         focus={focus}
         errors={this.state.errors}
         saving={this.state.saving}
@@ -147,7 +145,6 @@ ManageBlogPage.propTypes = {
 ManageBlogPage.contextTypes = {
   router: PropTypes.object
 };
-
 
 function getEntityStrategy(mutability) {
   return function (contentBlock, callback, contentState) {
