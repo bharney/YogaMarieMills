@@ -1,6 +1,7 @@
-import React, {PropTypes} from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const TextAreaInput = ({name, label, rows, onChange, placeholder, value, error}) => {
+const TextAreaInput = ({ name, label, rows, onChange, placeholder, value, error }) => {
   let wrapperClass = 'form-group';
   if (error && error.length > 0) {
     wrapperClass += " " + 'has-error';
@@ -16,7 +17,7 @@ const TextAreaInput = ({name, label, rows, onChange, placeholder, value, error})
           placeholder={placeholder}
           value={value}
           rows={rows}
-          onChange={onChange}/>
+          onChange={onChange} />
         {error && <div className="alert alert-danger">{error}</div>}
       </div>
     </div>

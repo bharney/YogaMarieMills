@@ -1,33 +1,34 @@
-﻿import React, {PropTypes} from 'react';
+﻿import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 
 
-const Blog = ({blog}) => {
+const Blog = ({ blog }) => {
     return (
-    <div className="col-xs-12 col-md-4">
-        <div div className="mdl-card mdl-shadow--4dp m-l-30 m-r-30 m-t-15 m-b-15 bg-white tile">
-            <div className="mdl-card__title ">
-                <div className="mdl-card__title-text">  
-                    <section className="text-center">
-                        <h2>{blog.name}</h2>
-                    </section>
+        <div className="col-12 col-md-4">
+            <div div className="mdl-card mdl-shadow--4dp m-l-30 m-r-30 m-t-15 m-b-15 bg-white tile">
+                <div className="mdl-card__title ">
+                    <div className="mdl-card__title-text">
+                        <section className="text-center">
+                            <h2>{blog.name}</h2>
+                        </section>
+                    </div>
                 </div>
-            </div>
-            <div className="mdl-card__media bg-black">
-                <div className="col-xs-offset-3 col-xs-7 p-t-20 p-b-20">
-                    <img width="200" className="img-circle" src={blog.image} />
+                <div className="mdl-card__media bg-black">
+                    <div className="offset-3 col-7 p-t-20 p-b-20">
+                        <img width="200" className="img-circle" src={blog.image} />
+                    </div>
                 </div>
-            </div>
-            <div className="mdl-card__supporting-text">
-                <p className="dark-color">{blog.description}</p>
-            </div>
-            <div className="mdl-card__actions mdl-card--border">
-                <div className="btn btn-default btn-block">
-                    <Link key={blog.route} to={'/' + blog.route} className="dark-color" activeClassName="active">{blog.name}</Link>
+                <div className="mdl-card__supporting-text">
+                    <p className="dark-color">{blog.description}</p>
+                </div>
+                <div className="mdl-card__actions mdl-card--border">
+                    <div className="btn btn-default btn-block">
+                        <Link key={blog.route} to={'/' + blog.route} className="dark-color" activeClassName="active">{blog.name}</Link>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     );
 };
 

@@ -67,77 +67,70 @@ let consultationRoutes = function () {
                 return res.status(401).send({ message: "You are not authorized" })
             }
             let consultation = (req.body);
+            const consultationDetails = consultation.consultationDetails || [];
             const sqlUpdateConsultation = new sql.Connection(dbconfig, function () {
                 let request = new sql.Request(sqlUpdateConsultation);
                 request.input('venue', sql.VarChar, consultation.venue);
                 request.input('short', sql.VarChar, consultation.short);
                 request.input('description', sql.VarChar, consultation.description);
                 request.input('type', sql.VarChar, 'diet');
+
+                const existingIds = consultationDetails
+                    .filter(consultationDetail => consultationDetail.id)
+                    .map(function (obj) { return obj.id; });
+                const deleteQuery = existingIds.length > 0
+                    ? `DELETE FROM Consultations WHERE type = 'diet' AND id NOT IN (${existingIds.join(',')})`
+                    : `DELETE FROM Consultations WHERE type = 'diet'`;
+
                 request.query(
-                    `UPDATE Headers 
+                    `UPDATE Headers
                      SET venue = @venue
                      , short = @short
                      , description = @description
                      FROM Headers
                      WHERE type = @type;`
                 ).then(function () {
-                        const sqlDeleteConsultationDetails = new sql.Connection(dbconfig, function () {
-                        let request = new sql.Request(sqlDeleteConsultationDetails);
-                        request.query(
-                            `DELETE FROM Consultations
-                            WHERE id NOT IN (${consultation.consultationDetails.filter(consultationDetails => consultationDetails.id).map(function(obj){return obj.id;}).join(',')})`
-                        ).then(function () {
-                                for (let prop in consultation.consultationDetails) {
-                                    if (consultation.consultationDetails.hasOwnProperty(prop)) {
-                                        if (consultation.consultationDetails[prop].id) {
-                                             const sqlUpdateConsultationDetails = new sql.Connection(dbconfig, function () {
-                                                let request = new sql.Request(sqlUpdateConsultationDetails);
-                                                request.input('id', sql.Int, consultation.consultationDetails[prop].id);
-                                                request.input('title', sql.VarChar, consultation.consultationDetails[prop].title);
-                                                request.input('session_time', sql.VarChar, consultation.consultationDetails[prop].session_time);
-                                                request.input('consultation', sql.VarChar, consultation.consultationDetails[prop].consultation);
-                                                request.input('consultation_desc', sql.VarChar, consultation.consultationDetails[prop].consultation_desc);
-                                                request.input('cost', sql.VarChar, tryParseCurrency(consultation.consultationDetails[prop].cost));
-                                                request.query(
-                                                    `UPDATE Consultations 
-                                                    SET title = @title
-                                                    , session_time = @session_time
-                                                    , short = @consultation
-                                                    , description = @consultation_desc
-                                                    , cost = @cost
-                                                    WHERE id = @id;`
-                                                ).then(console.log("ConsultationDetails Updated")
-                                                ).catch(function (err) {
-                                                    console.log("update ConsultationDetails: " + err);
-                                                });
-                                            });
-                                        } 
-                                        else {
-                                        const sqlInsertConsultationDetails = new sql.Connection(dbconfig, function () {
-                                            let request = new sql.Request(sqlInsertConsultationDetails);
-                                            request.input('type', sql.VarChar, 'diet');
-                                            request.input('title', sql.VarChar, consultation.consultationDetails[prop].title);
-                                            request.input('session_time', sql.VarChar, consultation.consultationDetails[prop].session_time);
-                                            request.input('consultation', sql.VarChar, consultation.consultationDetails[prop].consultation);
-                                            request.input('consultation_desc', sql.VarChar, consultation.consultationDetails[prop].consultation_desc);
-                                            request.input('cost', sql.VarChar, tryParseCurrency(consultation.consultationDetails[prop].cost));
-                                            request.query(
-                                                `INSERT INTO Consultations (type, title, session_time, short, description, cost)
-                                                VALUES (@type, @title, @session_time, @consultation, @consultation_desc, @cost);`
-                                            ).then(console.log("ConsultationDetails Inserted")
-                                            ).catch(function (err) {
-                                                console.log("insert ConsultationDetails: " + err);
-                                            });
-                                        });
-                                    }
-                                }
-                            }          
-                        }).catch(function (err) {
-                            console.log("ConsultationDetails delete" + err);
-                        });
+                    return new sql.Request(sqlUpdateConsultation).query(deleteQuery);
+                }).then(function () {
+                    const saveRequests = consultationDetails.map(function (detail) {
+                        if (detail.id) {
+                            let updateRequest = new sql.Request(sqlUpdateConsultation);
+                            updateRequest.input('id', sql.Int, detail.id);
+                            updateRequest.input('title', sql.VarChar, detail.title);
+                            updateRequest.input('session_time', sql.VarChar, detail.session_time);
+                            updateRequest.input('consultation', sql.VarChar, detail.consultation);
+                            updateRequest.input('consultation_desc', sql.VarChar, detail.consultation_desc);
+                            updateRequest.input('cost', sql.VarChar, tryParseCurrency(detail.cost));
+                            return updateRequest.query(
+                                `UPDATE Consultations
+                                 SET title = @title
+                                 , session_time = @session_time
+                                 , short = @consultation
+                                 , description = @consultation_desc
+                                 , cost = @cost
+                                 WHERE id = @id;`
+                            );
+                        }
+
+                        let insertRequest = new sql.Request(sqlUpdateConsultation);
+                        insertRequest.input('type', sql.VarChar, 'diet');
+                        insertRequest.input('title', sql.VarChar, detail.title);
+                        insertRequest.input('session_time', sql.VarChar, detail.session_time);
+                        insertRequest.input('consultation', sql.VarChar, detail.consultation);
+                        insertRequest.input('consultation_desc', sql.VarChar, detail.consultation_desc);
+                        insertRequest.input('cost', sql.VarChar, tryParseCurrency(detail.cost));
+                        return insertRequest.query(
+                            `INSERT INTO Consultations (type, title, session_time, short, description, cost)
+                             VALUES (@type, @title, @session_time, @consultation, @consultation_desc, @cost);`
+                        );
                     });
+
+                    return Promise.all(saveRequests);
+                }).then(function () {
+                    return res.status(200).json(consultation);
                 }).catch(function (err) {
-                        console.log("ConsultationDetails " + err);
+                    console.log("ConsultationDetails " + err);
+                    return res.status(500).send({ message: 'Unable to save consultation details.' });
                 });
             })
         })
@@ -172,37 +165,51 @@ let consultationRoutes = function () {
                     ,C.type AS type
                     ,H.header AS header
                     ,H.short AS short
-                    ,H.description AS description 
+                    ,H.description AS description
                     ,H.venue AS venue
                     ,C.session_time AS session_time
                     ,C.title AS title
                     ,C.short AS consultation
                     ,C.description AS consultation_desc
-                    ,CASE WHEN ISNUMERIC(C.cost) = 1 
-                                 THEN FORMAT(TRY_PARSE(C.cost AS money), 'C', 'de-de') 
+                    ,CASE WHEN ISNUMERIC(C.cost) = 1
+                                 THEN FORMAT(TRY_PARSE(C.cost AS money), 'C', 'de-de')
                                  ELSE C.cost END AS cost
                     ,C.icon AS icon
                     ,C.iconHeight AS iconHeight
                     ,C.iconWidth AS iconWidth
                     FROM Headers H
-                    JOIN Consultations C
-                    ON H.type = C.type`
+                    LEFT JOIN Consultations C
+                    ON H.type = C.type
+                    WHERE H.type = 'diet'`
                 ).then(function (recordset) {
+                    if (!recordset || recordset.length === 0) {
+                        return res.json({
+                            header: '',
+                            short: '',
+                            description: '',
+                            venue: '',
+                            consultationDetails: []
+                        });
+                    }
+
                     let consultationDetails = [];
                     for (let consultationProp in recordset) {
                         if (recordset.hasOwnProperty(consultationProp)) {
-                            consultationDetails.push({
-                                id: recordset[consultationProp].id,
-                                type: recordset[consultationProp].type,
-                                session_time: recordset[consultationProp].session_time,
-                                title: recordset[consultationProp].title,
-                                consultation: recordset[consultationProp].consultation,
-                                consultation_desc: recordset[consultationProp].consultation_desc,
-                                cost: recordset[consultationProp].cost,
-                                icon: recordset[consultationProp].icon,
-                                iconWidth: recordset[consultationProp].iconWidth,
-                                iconHeight: recordset[consultationProp].iconHeight
-                            });
+                            // LEFT JOIN rows with no Consultations match have null id — skip them
+                            if (recordset[consultationProp].id !== null) {
+                                consultationDetails.push({
+                                    id: recordset[consultationProp].id,
+                                    type: recordset[consultationProp].type,
+                                    session_time: recordset[consultationProp].session_time,
+                                    title: recordset[consultationProp].title,
+                                    consultation: recordset[consultationProp].consultation,
+                                    consultation_desc: recordset[consultationProp].consultation_desc,
+                                    cost: recordset[consultationProp].cost,
+                                    icon: recordset[consultationProp].icon,
+                                    iconWidth: recordset[consultationProp].iconWidth,
+                                    iconHeight: recordset[consultationProp].iconHeight
+                                });
+                            }
                         }
                     }
                     let consultation = {

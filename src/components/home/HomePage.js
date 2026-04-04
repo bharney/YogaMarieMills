@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -43,7 +44,7 @@ class HomePage extends React.Component {
                 <section style={landingImg} className="row p-3-em">
                     <div className="col-md-6 col-md-offset-3 text-center bright-color anchor ">
                         <h1 className="page-header">Yoga with Marie Mills</h1>
-                        <h2 banner>
+                        <h2>
                             Stress Reduction Specialist
                                     </h2>
                         <h3>Bakers street, Thurles, Co. Tipperary<br />
@@ -56,67 +57,67 @@ class HomePage extends React.Component {
                     </div>
                 </section>
                 <section className="t-border t-shadow row text-center p-3-em color-blur">
-                    <div className="col-xs-offset-1 col-xs-10">
+                    <div className="col-offset-1 col-10">
                         <h2>Marie is a Yoga practitioner in Thurles.</h2>
                         <div className="line-thru"><span>
                             <img src={require('../../images/greenlotus.png')} className="bg-color-transparent img-thru p-l-10 p-r-10" width="65" /></span>
                         </div>
                         <h3>Yoga and Ayurveda are integral to Traditional Indian Medicine and easily adapted
                                         to the modern life. Learn Yoga, Ayeruveda and more.</h3>
-                        <div className="col-sm-4 col-xs-12 p-t-5 p-b-40 p-l-15 p-r-15">
+                        <div className="col-sm-4 col-12 p-t-5 p-b-40 p-l-15 p-r-15">
                             <Link to="/Ayurveda/Massage/Body">
                                 <div className="icon-circle mdl-shadow--4dp lotus-flower bg-color-purple"></div>
                             </Link>
                             <div className="row">
-                                <div className="col-xs-12">
+                                <div className="col-12">
                                     <h4>Contemporary Ayeruveda</h4>
                                 </div>
                             </div>
-                            <div className="col-xs-offset-2 col-xs-8">
+                            <div className="col-offset-2 col-8">
                                 <hr />
                             </div>
                             <div className="row">
-                                <div className="col-xs-12">
+                                <div className="col-12">
                                     <Link className="color" to="/Ayurveda/Massage/Body">
                                         <p>Learn More</p>
                                     </Link>
                                 </div>
                             </div>
                         </div>
-                        <div className="col-sm-4 col-xs-12 p-t-5 p-b-40 p-l-15 p-r-15">
+                        <div className="col-sm-4 col-12 p-t-5 p-b-40 p-l-15 p-r-15">
                             <Link to="/YogaThurles/Schedule">
                                 <div className="icon-circle mdl-shadow--4dp om bright-bg-color"></div>
                             </Link>
                             <div className="row">
-                                <div className="col-xs-12">
+                                <div className="col-12">
                                     <h4>Yoga Workshops and Bespoke Yoga</h4>
                                 </div>
                             </div>
-                            <div className="col-xs-offset-2 col-xs-8">
+                            <div className="col-offset-2 col-8">
                                 <hr />
                             </div>
                             <div className="row">
-                                <div className="col-xs-12">
+                                <div className="col-12">
                                     <Link className="color" to="/YogaThurles/Schedule">
                                         <p>Learn More</p>
                                     </Link>
                                 </div>
                             </div>
                         </div>
-                        <div className="col-sm-4 col-xs-12 p-t-5 p-b-40 p-l-15 p-r-15">
+                        <div className="col-sm-4 col-12 p-t-5 p-b-40 p-l-15 p-r-15">
                             <Link to="/Ayurveda/DietConsultation">
                                 <div className="icon-circle mdl-shadow--4dp yoga-mat bg-color-green"></div>
                             </Link>
                             <div className="row">
-                                <div className="col-xs-12">
+                                <div className="col-12">
                                     <h4>Dietary Consultation</h4>
                                 </div>
                             </div>
-                            <div className="col-xs-offset-2 col-xs-8">
+                            <div className="col-offset-2 col-8">
                                 <hr />
                             </div>
                             <div className="row">
-                                <div className="col-xs-12">
+                                <div className="col-12">
                                     <Link className="color" to="/Ayurveda/DietConsultation">
                                         <p>Learn More</p>
                                     </Link>
@@ -128,7 +129,7 @@ class HomePage extends React.Component {
                 <section className="t-border t-shadow row" style={divider}>
                 </section>
                 <section className="row bg-color-transparent t-border t-shadow p-3-em color-blur">
-                    <div className="col-xs-12 col-sm-10 col-sm-offset-1">
+                    <div className="col-12 col-sm-10 col-sm-offset-1">
                         <h2 className="text-center">Specialties</h2>
                         <div className="text-center">
                             <h4>
@@ -138,61 +139,61 @@ class HomePage extends React.Component {
                                     </h4>
                         </div>
                         <div className="row m-t-1-em p-t-40 p-b-40 text-center">
-                            <div className="col-sm-4 col-xs-12 p-l-15 p-r-15">
+                            <div className="col-sm-4 col-12 p-l-15 p-r-15">
                                 <Link to="/Ayurveda/Massage/Body">
                                     <img className="img-circle img-responsive center-block mdl-shadow--4dp" src={yogaImg1} />
                                 </Link>
                                 <div className="row">
-                                    <div className="col-xs-12">
+                                    <div className="col-12">
                                         <h4>Contemporary Ayeruveda</h4>
                                     </div>
                                 </div>
-                                <div className="col-xs-offset-2 col-xs-8">
+                                <div className="col-offset-2 col-8">
                                     <hr />
                                 </div>
                                 <div className="row">
-                                    <div className="col-xs-12">
+                                    <div className="col-12">
 
-                                        <Link className="color" to="YogaThurlesSchedule">
+                                        <Link className="color" to="YogaThurles/Schedule">
                                             <p>Learn More</p>
                                         </Link>
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-sm-4 col-xs-12 p-l-15 p-r-15">
+                            <div className="col-sm-4 col-12 p-l-15 p-r-15">
                                 <Link to="/YogaThurles/Schedule">
                                     <img className="img-circle img-responsive center-block mdl-shadow--4dp" src={yogaImg2} />
                                 </Link>
                                 <div className="row">
-                                    <div className="col-xs-12">
+                                    <div className="col-12">
                                         <h4>Yoga Workshops and Bespoke Yoga</h4>
                                     </div>
                                 </div>
-                                <div className="col-xs-offset-2 col-xs-8">
+                                <div className="col-offset-2 col-8">
                                     <hr />
                                 </div>
                                 <div className="row">
-                                    <div className="col-xs-12">
-                                        <Link className="color" to="yogathurlescost">
+                                    <div className="col-12">
+                                        <Link className="color" to="yogathurles/cost">
                                             <p>Learn More</p>
                                         </Link>
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-sm-4 col-xs-12 p-l-15 p-r-15">
+                            <div className="col-sm-4 col-12 p-l-15 p-r-15">
                                 <Link to="/Ayurveda/DietConsultation">
                                     <img className="img-circle img-responsive center-block mdl-shadow--4dp" src={yogaImg3} />
                                 </Link>
                                 <div className="row">
-                                    <div className="col-xs-12">
+                                    <div className="col-12">
                                         <h4>Dietary Consultation</h4>
                                     </div>
                                 </div>
-                                <div className="col-xs-offset-2 col-xs-8">
+                                <div className="col-offset-2 col-8">
                                     <hr />
                                 </div>
                                 <div className="row">
-                                    <div className="col-xs-12">
+                                    <div className="col-12">
                                         <Link className="color" to="Contemporary">
                                             <p>Learn More</p>
                                         </Link>
@@ -203,12 +204,12 @@ class HomePage extends React.Component {
                     </div>
                 </section>
                 <section className="row p-t-40 p-b-40 row-center bg-color color-white t-border t-shadow">
-                    <div className="col-xs-12 col-sm-offset-1 col-sm-10">
+                    <div className="col-12 col-sm-offset-1 col-sm-10">
                         <h2 className="text-center">My Blog</h2>
                         <p className="text-center">Read useful information on Yoga and Ayurveda</p>
                         <div className="responsive-col-masonry">
                             {blogs.map(blog =>
-                                <BlogTile blog={blog} />)
+                                <BlogTile key={blog.id || blog.title} blog={blog} />)
                             }
                         </div>
                     </div>
@@ -229,7 +230,7 @@ class HomePage extends React.Component {
 HomePage.propTypes = {
     blogs: PropTypes.array.isRequired,
     actions: PropTypes.object.isRequired
-}
+};
 
 function mapStateToProps(state) {
     return {

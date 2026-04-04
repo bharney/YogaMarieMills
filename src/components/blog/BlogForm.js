@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import TextInput from '../common/TextInput';
 import Admin from '../common/Admin';
 import { Link } from 'react-router';
@@ -32,19 +33,19 @@ const plugins = [inlineToolbarPlugin];
 
 const { InlineToolbar } = inlineToolbarPlugin;
 
-const BlogForm = ({authorized, updateBlogState, onChange, deleteBlog, saveBlog, blog, editorState, ref, focus, uploadImage, displayImage }) => {
+const BlogForm = ({ authorized, updateBlogState, onChange, deleteBlog, saveBlog, blog, imagePreviewUrl, editorState, uploadImage, displayImage }) => {
 
   return (
     <div className="mdl-grid dark-color">
       <div className="ribbon bg-image-landing b-border">
         <div className="container">
           <div className="row m-b-1-em">
-            <div className="col-xs-12">
+            <div className="col-12">
               <h1 className="color-white text-center">{blog.title}</h1>
               <Admin uploadImage={uploadImage} blog={blog} saveAction={saveBlog} deleteAction={deleteBlog} authorized={authorized} />
               <div className="mdl-card mdl-shadow--4dp">
-                <div className="mdl-card__media v-h-40 image-text-container" style={displayImage(blog.image)}>
-                  <div className="col-xs-7 text-left align-bottom m-l-20 m-b-20">
+                <div className="mdl-card__media v-h-40 image-text-container" style={displayImage(imagePreviewUrl || blog.image)}>
+                  <div className="col-7 text-left align-bottom m-l-20 m-b-20">
                     <TextInput
                       name="title"
                       label="Title"
@@ -52,27 +53,26 @@ const BlogForm = ({authorized, updateBlogState, onChange, deleteBlog, saveBlog, 
                       onChange={updateBlogState} />
                   </div>
                 </div>
-                <div className="col-xs-12 t-border-thin p-20">
-                  <div className="mdl-color-text--grey-700 col-xs-12 m-b-15">
+                <div className="col-12 t-border-thin p-20">
+                  <div className="mdl-color-text--grey-700 col-12 m-b-15">
                     <div className="pull-left">
                       <p><strong>{blog.postDate} by <Link to="/about">Marie Mills</Link></strong></p>
                     </div>
                     <div className="pull-right">
-                      <i className="glyphicon glyphicon-heart fa-lg" aria-hidden="true"></i> &nbsp;
-                      <i className="glyphicon glyphicon-bookmark fa-lg" aria-hidden="true"></i> &nbsp;
-                      <i className="fa fa-share-alt fa-lg" aria-hidden="true"></i>
+                      <i className="glyphicon glyphicon-heart fa-lg" aria-hidden="true" /> &nbsp;
+                      <i className="glyphicon glyphicon-bookmark fa-lg" aria-hidden="true" /> &nbsp;
+                      <i className="fa fa-share-alt fa-lg" aria-hidden="true" />
                     </div>
                   </div>
-                  <div id="editor" className="editor" onClick={focus}>
-                    <p>
+                  <div id="editor" className="editor">
+                    <div>
                       <Editor
                         editorState={editorState}
                         onChange={onChange}
-                        ref={ref}
                         plugins={plugins}
                       />
                       <InlineToolbar />
-                    </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -85,15 +85,18 @@ const BlogForm = ({authorized, updateBlogState, onChange, deleteBlog, saveBlog, 
 };
 
 BlogForm.propTypes = {
-  blog: React.PropTypes.object.isRequired,
-  editorState: React.PropTypes.object.isRequired,
-  updateBlogState: React.PropTypes.object.isRequired,
-  focus: React.PropTypes.object.isRequired,
-  saving: React.PropTypes.object.isRequired,
-  uploadImage: React.PropTypes.object.isRequired,
-  saveBlog: React.PropTypes.func.isRequired,
-  onChange: React.PropTypes.func.isRequired,
-  errors: React.PropTypes.object
+  blog: PropTypes.object.isRequired,
+  authorized: PropTypes.object,
+  imagePreviewUrl: PropTypes.string,
+  editorState: PropTypes.object.isRequired,
+  updateBlogState: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  saveBlog: PropTypes.func.isRequired,
+  deleteBlog: PropTypes.func,
+  saving: PropTypes.bool,
+  uploadImage: PropTypes.func.isRequired,
+  displayImage: PropTypes.func.isRequired,
+  errors: PropTypes.object
 };
 
 export default BlogForm;

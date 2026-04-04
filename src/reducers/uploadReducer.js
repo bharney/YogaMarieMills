@@ -5,7 +5,7 @@ export default function uploadReducer(state = initialState.upload, action) {
         case 'UPLOAD_FILE_SUCCESS':
             return [
                 ...state,
-                Object.assign({}, action.upload)
+                Object.assign({}, action.file)
             ];
         default:
             return state;

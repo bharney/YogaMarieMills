@@ -1,7 +1,7 @@
 import express from 'express';
 import sql from 'mssql';
 import bcrypt from 'bcrypt-nodejs';
-import {secret, dbconfig} from '../../secrets';
+import { secret, dbconfig } from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
 
@@ -16,42 +16,38 @@ let userRoutes = function () {
 
     userRouter.route('/users')
         .post(function (req, res) {
-            if (!req.headers.authorization) {
-                return res.status(401).send({ message: "You are not authorized" })
-            }
-            const authorization = JSON.parse(req.headers.authorization.slice(7));
-            const payload = jwt.decode(authorization.token, secret);
-            if (!payload.sub) {
-                return res.status(401).send({ message: "You are not authorized" })
-            }
-            if (moment().unix() > payload.exp) {
-                return res.status(401).send({ message: "You are not authorized" })
-            }
+            // if (!req.headers.authorization) {
+            //     return res.status(401).send({ message: "You are not authorized" })
+            // }
+            // const authorization = JSON.parse(req.headers.authorization.slice(7));
+            // const payload = jwt.decode(authorization.token, secret);
+            // if (!payload.sub) {
+            //     return res.status(401).send({ message: "You are not authorized" })
+            // }
+            // if (moment().unix() > payload.exp) {
+            //     return res.status(401).send({ message: "You are not authorized" })
+            // }
             let user = (req.body);
-            console.log("user: " + user.password);
-            let password;
-
             bcrypt.hash(user.password, null, null, function (err, hash) {
-                if (err) return;
-                console.log("hash: " + hash);
-                password = hash;
-            });
-            console.log("user.password: " + password);
-            const sqlInsertLogin = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlInsertLogin);
-                request.input('emailAddress', sql.VarChar, user.emailAddress);
-                request.input('firstName', sql.VarChar, user.firstName);
-                request.input('lastName', sql.VarChar, user.LastName);
-
-                request.input('password', sql.VarChar, password);
-                request.query(
-                    `INSERT INTO Users (emailAddress, firstName, lastName, password, createdDate)
-                     VALUES (@emailAddress, @firstName, @lastName, @password, GETDATE());`
-                ).then(function () {
-                    delete user.password;
-                    res.status(201).send(user);
-                }).catch(function (err) {
-                    console.log("users: " + err);
+                if (err) {
+                    console.log("bcrypt error: " + err);
+                    return res.status(500).send({ message: "Error creating user" });
+                }
+                const sqlInsertLogin = new sql.Connection(dbconfig, function () {
+                    let request = new sql.Request(sqlInsertLogin);
+                    request.input('emailAddress', sql.VarChar, user.emailAddress);
+                    request.input('firstName', sql.VarChar, user.firstName);
+                    request.input('lastName', sql.VarChar, user.lastName);
+                    request.input('password', sql.VarChar, hash);
+                    request.query(
+                        `INSERT INTO Users (emailAddress, firstName, lastName, password, createdDate)
+                         VALUES (@emailAddress, @firstName, @lastName, @password, GETDATE());`
+                    ).then(function () {
+                        delete user.password;
+                        res.status(201).send(user);
+                    }).catch(function (err) {
+                        console.log("users: " + err);
+                    });
                 });
             });
         })
@@ -122,8 +118,6 @@ let userRoutes = function () {
                             ,firstName
                             ,lastName
                             ,'**********' AS password
-                            ,createdDate
-                            ,changedDate
                             FROM Users
                             ORDER BY id`
                 ).then(function (recordset) {

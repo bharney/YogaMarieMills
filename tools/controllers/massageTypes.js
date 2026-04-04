@@ -43,14 +43,20 @@ let massageTypeRoutes = function () {
                 request.input('cost', sql.VarChar, tryParseCurrency(massageType.cost));
                 request.query(
                     `INSERT INTO MassageTypes (type, title, session_time, description, cost)
-                     VALUES (@type, @title, @session_time, @description, @cost); 
+                     VALUES (@type, @title, @session_time, @description, @cost);
                      SELECT SCOPE_IDENTITY() AS parent_id;`
                 ).then(function (recordset) {
+                    if (!recordset || recordset.length === 0) {
+                        return res.status(500).send('Unable to create massage type parent row.');
+                    }
+
+                    const newId = recordset[0].parent_id;
+
                     for (let prop in massageType.massage_details) {
                         if (massageType.massage_details.hasOwnProperty(prop)) {
                             const sqlInsertMassageDetails = new sql.Connection(dbconfig, function () {
                                 let request = new sql.Request(sqlInsertMassageDetails);
-                                request.input('parent_id', sql.Int, recordset[0].parent_id);
+                                request.input('parent_id', sql.Int, newId);
                                 request.input('type', sql.VarChar, 'MassageDetail');
                                 request.input('title', sql.VarChar, massageType.massage_details[prop].title);
                                 request.input('description', sql.VarChar, massageType.massage_details[prop].description);
@@ -65,6 +71,8 @@ let massageTypeRoutes = function () {
                             });
                         }
                     }
+
+                    res.status(201).json(Object.assign({}, massageType, { id: newId }));
                 }).catch(function (err) {
                     console.log("massageType: " + err);
                 });
@@ -92,7 +100,7 @@ let massageTypeRoutes = function () {
                 request.input('description', sql.VarChar, massageType.description);
                 request.input('cost', sql.VarChar, tryParseCurrency(massageType.cost));
                 request.query(
-                    `UPDATE MassageTypes 
+                    `UPDATE MassageTypes
                         SET type = @type
                         ,title = @title
                         , session_time = @session_time
@@ -119,7 +127,7 @@ let massageTypeRoutes = function () {
                                                 request.input('title', sql.VarChar, massageType.massage_details[prop].title);
                                                 request.input('description', sql.VarChar, massageType.massage_details[prop].description);
                                                 request.query(
-                                                    `UPDATE MassageDetails 
+                                                    `UPDATE MassageDetails
                                                         SET type = @type
                                                         ,title = @title
                                                         , description = @description
@@ -130,7 +138,7 @@ let massageTypeRoutes = function () {
                                                     console.log("update MassageDetails: " + err);
                                                 });
                                             });
-                                        } 
+                                        }
                                         else {
                                         const sqlInsertMassageDetails = new sql.Connection(dbconfig, function () {
                                             let request = new sql.Request(sqlInsertMassageDetails);
@@ -148,7 +156,7 @@ let massageTypeRoutes = function () {
                                         });
                                     }
                                 }
-                            }          
+                            }
                         }).catch(function (err) {
                             console.log("MassageDetails delete" + err);
                         });
@@ -157,7 +165,7 @@ let massageTypeRoutes = function () {
                         console.log("MassageType " + err);
                 });
             })
-        })    
+        })
         .delete(function (req, res) {
             if (!req.headers.authorization) {
                 return res.status(401).send({ message: "You are not authorized" })
@@ -210,8 +218,8 @@ let massageTypeRoutes = function () {
                     ,M.session_time AS session_time
                     ,M.title AS title
                     ,NULL AS parent_id
-                    ,CASE WHEN ISNUMERIC(M.cost) = 1 
-                                 THEN FORMAT(TRY_PARSE(M.cost AS money), 'C', 'de-de') 
+                    ,CASE WHEN ISNUMERIC(M.cost) = 1
+                                 THEN FORMAT(TRY_PARSE(M.cost AS money), 'C', 'de-de')
                                  ELSE M.cost END AS cost
                     ,M.icon AS icon
                     ,M.iconHeight AS iconHeight

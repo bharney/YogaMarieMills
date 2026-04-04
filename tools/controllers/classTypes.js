@@ -34,8 +34,8 @@ let classTypeRoutes = function () {
                 request.input('detail', sql.VarChar, classType.detail);
                 request.input('route', sql.VarChar, classType.route);
                 request.query(
-                    `INSERT INTO ClassTypes (type, title, short, description, image, href, type, component, detail, route)
-                     VALUES (@type, @title, @short, @description, @image, @href, @type, @component, @detail, @route)`
+                    `INSERT INTO ClassTypes (type, title, short, description, image, href, component, detail, route)
+                     VALUES (@type, @title, @short, @description, @image, @href, @component, @detail, @route)`
                 ).then(res.status(201).send(classType)).catch(function (err) {
                     console.log("insert ClassTypes: " + err);
                 });
@@ -109,7 +109,7 @@ let classTypeRoutes = function () {
         .get(function (req, res) {
             const sqlClassTypes = new sql.Connection(dbconfig, function () {
                 let request = new sql.Request(sqlClassTypes);
-                request.query(`SELECT id 
+                request.query(`SELECT id
                                 ,type
                                 ,title
                                 ,image

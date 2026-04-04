@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import TextInput from '../common/TextInput';
 import TextAreaInput from '../common/TextAreaInput';
 import RemoveRowButton from '../common/RemoveRowButton';
@@ -39,11 +40,11 @@ const TestimonialDetailsForm = ({ updateQuoteState, updateNameState, removeRow, 
 };
 
 TestimonialDetailsForm.propTypes = {
-  testimonial: React.PropTypes.object.isRequired,
-  updateTestimonialState: React.PropTypes.object.isRequired,
-  saving: React.PropTypes.object.isRequired,
-  saveTestimonial: React.PropTypes.func.isRequired,
-  errors: React.PropTypes.object
+  testimonial: PropTypes.object.isRequired,
+  updateTestimonialState: PropTypes.object.isRequired,
+  saving: PropTypes.object.isRequired,
+  saveTestimonial: PropTypes.func.isRequired,
+  errors: PropTypes.object
 };
 
 export default TestimonialDetailsForm;

@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as blogActions from '../../actions/blogActions';
@@ -10,27 +11,43 @@ class ManageBlogPage extends React.Component {
   constructor(props, context) {
     super(props, context);
 
-    const decorator = new CompositeDecorator([
+    this.decorator = new CompositeDecorator([
       {
         strategy: getEntityStrategy('MUTABLE'),
-        component: TokenSpan,
+        component: (componentProps) => (
+          <span data-offset-key={componentProps.offsetKey}>
+            {componentProps.children}
+          </span>
+        ),
       },
     ]);
 
-    let blocks = convertFromRaw(blocks = { blocks: [{ text: '', type: 'unstyled', },], entityMap: { first: { type: 'TOKEN', mutability: 'MUTABLE', }, } });
-    if (props.blog.description != "")
-      blocks = convertFromRaw(JSON.parse(props.blog.description));
+    const defaultRawContent = {
+      blocks: [{ text: '', type: 'unstyled' }],
+      entityMap: {}
+    };
+    let blocks = convertFromRaw(defaultRawContent);
+
+    if (props.blog.description) {
+      try {
+        blocks = convertFromRaw(JSON.parse(props.blog.description));
+      } catch (error) {
+        blocks = convertFromRaw(defaultRawContent);
+      }
+    }
 
     this.state = {
       blog: Object.assign({}, props.blog),
       editorState: EditorState.createWithContent(
         blocks,
-        decorator,
+        this.decorator,
       ),
+      imagePreviewUrl: '',
+      errors: {},
+      saving: false,
     };
 
     this.onChange = this.onChange.bind(this);
-    this.focus = this.focus.bind(this);
     this.saveBlog = this.saveBlog.bind(this);
     this.deleteBlog = this.deleteBlog.bind(this);
     this.getTextFromEntity = this.getTextFromEntity.bind(this);
@@ -38,13 +55,22 @@ class ManageBlogPage extends React.Component {
     this.uploadImage = this.uploadImage.bind(this);
     this.displayImage = this.displayImage.bind(this);
   }
-  componentWillReceiveProps(nextProps) {
-    if (this.props.blog.id != nextProps.blog.id) {
-      this.setState({ blog: Object.assign({}, nextProps.blog) });
-      const blocks = convertFromRaw(JSON.parse(nextProps.blog.description));
-      const editorState = EditorState.push(this.state.editorState, blocks);
-      this.setState({ editorState });
+  componentWillUnmount() {
+    if (this.state.imagePreviewUrl && this.state.imagePreviewUrl.indexOf('blob:') === 0) {
+      URL.revokeObjectURL(this.state.imagePreviewUrl);
+    }
+  }
 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (this.props.blog.id !== nextProps.blog.id) {
+      const blocks = nextProps.blog.description ?
+        convertFromRaw(JSON.parse(nextProps.blog.description)) :
+        convertFromRaw({ blocks: [{ text: '', type: 'unstyled' }], entityMap: {} });
+      const editorState = EditorState.createWithContent(blocks, this.decorator);
+      this.setState({
+        blog: Object.assign({}, nextProps.blog),
+        editorState
+      });
     }
   }
 
@@ -52,15 +78,11 @@ class ManageBlogPage extends React.Component {
     this.setState({ editorState });
   }
 
-  focus() {
-    this.refs.editor.focus();
-  }
-
   getTextFromEntity(editorObj) {
     let descriptionBlocks = [];
     for (let prop in editorObj.blocks) {
       if (editorObj.blocks.hasOwnProperty(prop)) {
-        descriptionBlocks.push(editorObj.blocks[prop].text)
+        descriptionBlocks.push(editorObj.blocks[prop].text);
       }
     }
     return descriptionBlocks.join("\\n ");
@@ -85,16 +107,22 @@ class ManageBlogPage extends React.Component {
   uploadImage(e) {
     e.preventDefault();
 
-    let reader = new FileReader();
     let file = e.target.files[0];
-
-    reader.onloadend = () => {
-      let blog = this.state.blog;
-      blog.image = file.name
-      this.props.upload.uploadFile(file);
-      return this.setState({ blog: blog });
+    if (!file) {
+      return;
     }
-    reader.readAsDataURL(file)
+
+    const previousPreviewUrl = this.state.imagePreviewUrl;
+    const imagePreviewUrl = URL.createObjectURL(file);
+    let blog = this.state.blog;
+    blog.image = file.name;
+
+    this.props.upload.uploadFile(file);
+    this.setState({ blog: blog, imagePreviewUrl });
+
+    if (previousPreviewUrl && previousPreviewUrl.indexOf('blob:') === 0) {
+      URL.revokeObjectURL(previousPreviewUrl);
+    }
   }
 
   updateBlogState(event) {
@@ -105,29 +133,45 @@ class ManageBlogPage extends React.Component {
   }
 
   displayImage(image) {
-    image = image ? require(`../../images/${image}`) : '';
+    let imageSrc = '';
+
+    if (image) {
+      if (image.indexOf('blob:') === 0 || image.indexOf('data:') === 0 || image.indexOf('http') === 0 || image.indexOf('/') === 0) {
+        imageSrc = image;
+      } else {
+        try {
+          imageSrc = require(`../../images/${image}`);
+        } catch (error) {
+          imageSrc = `/images/${encodeURIComponent(image)}`;
+        }
+      }
+    }
+
+    if (imageSrc && imageSrc.indexOf('blob:') !== 0 && imageSrc.indexOf('data:') !== 0) {
+      imageSrc = encodeURI(imageSrc);
+    }
+
     return ({
-      backgroundImage: 'url(' + image + ')',
+      backgroundImage: imageSrc ? `url("${imageSrc}")` : 'none',
       backgroundRepeat: "no-repeat",
       backgroundPosition: "center",
       backgroundSize: "cover"
-    })
+    });
   }
 
 
   render() {
-    const {authorized} = this.props;
+    const { authorized } = this.props;
     return (
       <BlogForm
-      authorized={authorized}
+        authorized={authorized}
         updateBlogState={this.updateBlogState}
         onChange={this.onChange}
         saveBlog={this.saveBlog}
         deleteBlog={this.deleteBlog}
         blog={this.state.blog}
+        imagePreviewUrl={this.state.imagePreviewUrl}
         editorState={this.state.editorState}
-        ref="editor"
-        focus={focus}
         errors={this.state.errors}
         saving={this.state.saving}
         uploadImage={this.uploadImage}
@@ -139,7 +183,9 @@ class ManageBlogPage extends React.Component {
 
 ManageBlogPage.propTypes = {
   blog: PropTypes.object.isRequired,
-  actions: PropTypes.object.isRequired
+  actions: PropTypes.object.isRequired,
+  upload: PropTypes.object.isRequired,
+  authorized: PropTypes.object
 };
 
 ManageBlogPage.contextTypes = {
@@ -160,15 +206,6 @@ function getEntityStrategy(mutability) {
     );
   };
 }
-
-const TokenSpan = (props) => {
-  return (
-    <span data-offset-key={props.offsetkey}>
-      {props.children}
-    </span>
-  );
-};
-
 
 function getBlogById(blogs, id) {
   const blog = blogs.filter(blog => blog.id == id);

@@ -1,10 +1,11 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 const ErrorMessages = ({ errorMessage }) => {
-  
+
   function displayError(error) {
     if (errorMessage)
-    return error
+      return error
 
     return "";
   }

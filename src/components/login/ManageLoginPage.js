@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as loginActions from '../../actions/authTokenActions';
@@ -30,7 +31,7 @@ class ManageLoginPage extends React.Component {
   }
 
   render() {
-    let {errorMessage} = this.props
+    let { errorMessage } = this.props
     return (
       <LoginForm
         errorMessage={errorMessage}

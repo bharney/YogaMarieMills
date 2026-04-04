@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import TextInput from '../common/TextInput';
 import ConsultationDetailsForm from './ConsultationDetailsForm';
@@ -54,7 +55,7 @@ const DietConsultationForm = ({ updateTitleState, updateCostState, updateSession
             <InlineToolbar />
           </p>
         </div>
-        <ConsultationDetailsForm 
+        <ConsultationDetailsForm
           removeRow={removeRow}
           updateTitleState={updateTitleState}
           updateCostState={updateCostState}
@@ -77,11 +78,11 @@ const DietConsultationForm = ({ updateTitleState, updateCostState, updateSession
 };
 
 DietConsultationForm.propTypes = {
-  dietConsultation: React.PropTypes.object.isRequired,
-  updateDietConsultationState: React.PropTypes.object.isRequired,
-  saving: React.PropTypes.object.isRequired,
-  saveDietConsultation: React.PropTypes.func.isRequired,
-  errors: React.PropTypes.object
+  dietConsultation: PropTypes.object.isRequired,
+  updateDietConsultationState: PropTypes.object.isRequired,
+  saving: PropTypes.object.isRequired,
+  saveDietConsultation: PropTypes.func.isRequired,
+  errors: PropTypes.object
 };
 
 export default DietConsultationForm;

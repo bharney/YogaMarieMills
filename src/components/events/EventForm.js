@@ -1,7 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import TextInput from '../common/TextInput';
 import Admin from '../common/Admin';
-import DatePicker from 'material-ui/DatePicker';
 import Editor from 'draft-js-plugins-editor';
 
 import createInlineToolbarPlugin from 'draft-js-inline-toolbar-plugin';
@@ -44,8 +44,6 @@ const EventTypeForm = ({
   focus,
   uploadImage,
   deleteEvent,
-  updateStartDateState,
-  updateEndDateState,
   displayEventType,
   displayImage }) => {
 
@@ -54,17 +52,17 @@ const EventTypeForm = ({
       <div className="ribbon bg-image-landing b-border">
         <div className="container">
           <div className="row m-b-1-em">
-            <div className="col-xs-12">
+            <div className="col-12">
               {displayEventType(eventType.header, updateEventState)}
               <hr width="50%" className="center-block" />
-              <Admin addAction={"Admin/Events"} authorized={authorized}/>
-              <div className="col-xs-12 m-b-1-em">
+              <Admin addAction={"Admin/Events"} authorized={authorized} />
+              <div className="col-12 m-b-1-em">
                 <form>
-                  <Admin saveAction={saveEvent} deleteAction={deleteEvent} uploadImage={uploadImage} authorized={authorized}/>
+                  <Admin saveAction={saveEvent} deleteAction={deleteEvent} uploadImage={uploadImage} authorized={authorized} />
                   <div className="mdl-card mdl-shadow--4dp">
                     <div className="mdl-card__media image-text-container" style={displayImage(eventType.image)}>
                       <img src={"/" + eventType.image} className="img-responsive hdn" />
-                      <div className="col-xs-7 text-left align-bottom m-l-20 m-b-20">
+                      <div className="col-7 text-left align-bottom m-l-20 m-b-20">
                         <TextInput
                           name="title"
                           label="Title"
@@ -72,8 +70,8 @@ const EventTypeForm = ({
                           onChange={updateEventState} />
                       </div>
                     </div>
-                    <div className="col-xs-12">
-                      <div className="col-xs-6 text-left p-l-30">
+                    <div className="col-12">
+                      <div className="col-6 text-left p-l-30">
                         <TextInput
                           name="venue"
                           label="Venue"
@@ -92,8 +90,8 @@ const EventTypeForm = ({
                           value={eventType.cost}
                           onChange={updateEventState} />
                       </div>
-                      <div className="col-xs-6 text-right p-r-30">
-                        <DatePicker
+                      <div className="col-6 text-right p-r-30">
+                        {/* <DatePicker
                           formatDate={new Intl.DateTimeFormat('en-US', {
                             weekday: 'long',
                             day: 'numeric',
@@ -114,9 +112,9 @@ const EventTypeForm = ({
                           floatingLabelText="End Date"
                           value={new Date(eventType.end_date)}
                           name="end_date"
-                          onChange={updateEndDateState} />
+                          onChange={updateEndDateState} /> */}
                       </div>
-                      <div className="col-xs-12 t-border-thin p-20">
+                      <div className="col-12 t-border-thin p-20">
                         <div id="editor" className="editor" onClick={focus}>
                           <p>
                             <Editor
@@ -142,15 +140,15 @@ const EventTypeForm = ({
 };
 
 EventTypeForm.propTypes = {
-  eventType: React.PropTypes.object.isRequired,
-  editorState: React.PropTypes.object.isRequired,
-  updateEventState: React.PropTypes.object.isRequired,
-  focus: React.PropTypes.object.isRequired,
-  saving: React.PropTypes.object.isRequired,
-  uploadImage: React.PropTypes.object.isRequired,
-  saveEventType: React.PropTypes.func.isRequired,
-  onChange: React.PropTypes.func.isRequired,
-  errors: React.PropTypes.object
+  eventType: PropTypes.object.isRequired,
+  editorState: PropTypes.object.isRequired,
+  updateEventState: PropTypes.object.isRequired,
+  focus: PropTypes.object.isRequired,
+  saving: PropTypes.object.isRequired,
+  uploadImage: PropTypes.object.isRequired,
+  saveEventType: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  errors: PropTypes.object
 };
 
 export default EventTypeForm;

@@ -1,11 +1,22 @@
-﻿import React, { PropTypes } from 'react';
+﻿import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import MultilineText from '../common/MultilineText';
 
 const Blog = ({ blog }) => {
+    const blogRoute = blog.route
+        ? `/${String(blog.route).replace(/^\/+/, '')}${blog.id ? `/${blog.id}` : ''}`
+        : (blog.type && blog.id ? `/${String(blog.type).replace(/^\/+/, '')}/${blog.id}` : null);
 
     function blogImage(image) {
-        let blogImg = image != "" ? require(`../../images/${image}`) : ""
+        let blogImg = "";
+        if (image) {
+            try {
+                blogImg = require(`../../images/${image}`);
+            } catch (error) {
+                blogImg = `/images/${encodeURIComponent(image)}`;
+            }
+        }
         const styles = {
             blog: {
                 img: {
@@ -47,20 +58,20 @@ const Blog = ({ blog }) => {
                     </div>
                 </div>
                 <div className="mdl-card__supporting-text">
-                    <p className="dark-color">
+                    <div className="dark-color">
                         <MultilineText multilineText={previewText(blog.short)} />
-                    </p>
+                    </div>
                 </div>
             </div>
             <div className="mdl-card__actions mdl-card--border">
-                <Link key={blog.id} to={'/' + blog.type + '/' + blog.id} className="dark-color btn btn-default btn-block" activeClassName="active">Read More</Link>
+                {blogRoute ? <Link key={blog.id} to={blogRoute} className="dark-color btn btn-default btn-block" activeClassName="active">Read More</Link> : null}
             </div>
         </div>
     );
 };
 
 Blog.propTypes = {
-    blog: PropTypes.array.isRequired
+    blog: PropTypes.object.isRequired
 };
 
 export default Blog;

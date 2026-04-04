@@ -1,4 +1,5 @@
-﻿import React, { PropTypes } from 'react';
+﻿import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import MultilineText from '../common/MultilineText';
@@ -15,7 +16,14 @@ class BlogPage extends React.Component {
         const { blogs } = this.props;
         const { authorized } = this.props;
         function blogImage(image) {
-            let blogImg = image != "" ? require(`../../images/${image}`) : ""
+            let blogImg = "";
+            if (image) {
+                try {
+                    blogImg = require(`../../images/${image}`);
+                } catch (error) {
+                    blogImg = `/images/${encodeURIComponent(image)}`;
+                }
+            }
             const styles = {
                 blog: {
                     img: {
@@ -39,7 +47,7 @@ class BlogPage extends React.Component {
                     <div className="ribbon bg-image-landing b-border">
                         <div className="container-fluid">
                             <div className="row">
-                                <div className="col-sm-offset-1 col-sm-10 col-xs-12 m-b-1-em">
+                                <div className="col-sm-offset-1 col-sm-10 col-12 m-b-1-em">
                                     <h1 className="text-center color-white">My Blog</h1>
                                     <Admin addAction={"Admin/Blog"} authorized={authorized} />
                                     <h2 className="text-center color-white">Read useful information on Yoga and Ayurveda</h2>

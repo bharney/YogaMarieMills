@@ -1,12 +1,37 @@
 import express from 'express';
 import path from 'path';
-import fs from 'fs';
 import multer from 'multer'
 import secret from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
 
-let upload = multer({ dest: '/temp/' });
+const imageUploadPath = path.join(__dirname, '../../uploaded-images');
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, imageUploadPath);
+    },
+    filename: function (req, file, cb) {
+        const extension = path.extname(file.originalname).toLowerCase();
+        const baseName = path.basename(file.originalname, extension)
+            .replace(/[^a-zA-Z0-9-_ ]/g, '')
+            .trim()
+            .replace(/\s+/g, '-');
+        cb(null, `${Date.now()}-${baseName}${extension}`);
+    }
+});
+
+const fileFilter = function (req, file, cb) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (ext === '.png' || ext === '.jpg' || ext === '.jpeg' || ext === '.gif') {
+        cb(null, true);
+        return;
+    }
+
+    cb(new Error('Only .png, .jpg, .jpeg, and .gif files are allowed'));
+};
+
+let upload = multer({ storage: storage, fileFilter: fileFilter });
 
 let uploadRoute = function () {
 
@@ -24,44 +49,14 @@ let uploadRoute = function () {
         if (moment().unix() > payload.exp) {
             return res.status(401).send({ message: "You are not authorized" })
         }
-        let file = __dirname + "/temp/" + req.file.originalname;
-        let response;
-        if (path.extname(req.file.originalname).toLowerCase() === '.png' ||
-            path.extname(req.file.originalname).toLowerCase() === '.jpg' ||
-            path.extname(req.file.originalname).toLowerCase() === '.gif') {
+        const response = {
+            message: 'File uploaded successfully',
+            filename: req.file.filename,
+            originalFilename: req.file.originalname,
+            url: '/images/' + encodeURIComponent(req.file.filename)
+        };
 
-            fs.readFile(req.file.path, function (err, data) {
-                fs.writeFile(file, data, function (err) {
-                    if (err) {
-                        console.error(err);
-                        response = {
-                            message: 'Sorry, file couldn\'t be uploaded.',
-                            filename: req.file.originalname
-                        };
-                    } else {
-                        response = {
-                            message: 'File uploaded successfully',
-                            filename: req.file.originalname
-                        };
-                        const targetPath = __dirname + "../../../src/images/" + req.file.originalname
-                        fs.rename(file, targetPath, function (err) {
-                            if (err) {
-                                console.log("error moving file to working path " + err);
-                            }
-                            else {
-                                console.log("Upload moved from temp to working path.");
-                            }
-                        });
-                    }
-                    console.log(JSON.stringify(response));
-                    res.end(JSON.stringify(response));
-                });
-            });
-        } else {
-            fs.unlink(req.file.path, function () {
-                console.log("Only .png, .jpg, and .gif files are allowed!");
-            });
-        }
+        res.json(response);
     })
 
     return uploadRouter;

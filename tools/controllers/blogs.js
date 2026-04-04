@@ -33,7 +33,9 @@ let blogRoutes = function () {
                      VALUES (@title, @short, @description, @image, '', 'blog', 'BlogPage');
                      SELECT SCOPE_IDENTITY() as id`
                 ).then(function (recordset) {
-                    blog.id = recordset[0].id;
+                    if (recordset && recordset.length > 0) {
+                        blog.id = recordset[0].id;
+                    }
                     blog.type = 'blog'
                     blog.component = 'BlogPage'
                     res.status(201).send(blog)

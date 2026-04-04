@@ -3,7 +3,7 @@ import { getToken } from '../actions/authTokenActions';
 class ClassTypesApi {
   static getAllClassTypes() {
     return new Promise((resolve) => {
-      fetch('http://localhost:3000/api/classTypes').then(function (response) {
+      fetch('/api/classTypes').then(function (response) {
         return response.json();
       }).then(function (classTypes) {
         resolve(Object.assign([], classTypes));
@@ -15,7 +15,7 @@ class ClassTypesApi {
     classType = Object.assign({}, classType);
     return new Promise((resolve) => {
       if (classType.id) {
-        fetch('http://localhost:3000/api/classTypes', {
+        fetch('/api/classTypes', {
           method: 'put',
           headers: {
             'Accept': 'application/json, text/plain, */*',
@@ -31,7 +31,7 @@ class ClassTypesApi {
           console.log('Request failed', error);
         });
       } else {
-        fetch('http://localhost:3000/api/classTypes', {
+        fetch('/api/classTypes', {
           method: 'post',
           headers: {
             'Accept': 'application/json, text/plain, */*',
@@ -54,7 +54,7 @@ class ClassTypesApi {
     return new Promise((resolve) => {
       if (confirm("Are you sure you want to delete this classType forever?")) {
         if (classTypeId) {
-          fetch('http://localhost:3000/api/classTypes/' + classTypeId, {
+          fetch('/api/classTypes/' + classTypeId, {
             method: 'delete',
             headers: {
               'Accept': 'application/json, text/plain, */*',

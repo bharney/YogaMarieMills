@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -54,15 +55,17 @@ class ManageMassagePage extends React.Component {
   saveMassage(event) {
     event.preventDefault();
     let massage = this.state.massage;
-    if (!massage.icon)
-    {
+    if (!massage.icon) {
       massage.icon = 'whitearomaoil.png';
       massage.iconHeight = '3em';
       massage.iconWidth = '1.8em';
     }
     this.setState({ massage });
-    this.props.actions.saveMassage(this.state.massage);
-    this.context.router.push('/Ayurveda/Massage/' + massage.type);
+    this.props.actions.saveMassage(this.state.massage)
+      .then(() => this.props.actions.loadMassage())
+      .then(() => {
+        this.context.router.push('/Ayurveda/Massage/' + massage.type);
+      });
   }
 
   deleteMassage() {
@@ -74,7 +77,7 @@ class ManageMassagePage extends React.Component {
   addRow(e) {
     e.preventDefault();
     let massage = this.state.massage;
-    massage.massage_details.push({ id:'', title: '', description: '' })
+    massage.massage_details.push({ id: '', title: '', description: '' })
     this.setState({ massage });
   }
 
@@ -86,17 +89,17 @@ class ManageMassagePage extends React.Component {
   }
 
   render() {
-    const {authorized} = this.props;
+    const { authorized } = this.props;
     return (
       <div className="mdl-grid dark-color bg-color">
         <div className="ribbon bg-image-landing b-border">
           <div className="container-fluid">
             <div className="row m-b-1-em">
-              <div className="col-xs-12 col-sm-offset-1 col-sm-10 m-b-1-em">
+              <div className="col-12 offset-sm-1 col-sm-10 m-b-1-em">
                 <Admin saveAction={this.saveMassage} deleteAction={this.deleteMassage} authorized={authorized} />
                 <br />
                 <br />
-                <div className="col-xs-12 col-sm-offset-2 col-sm-8 col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6 m-b-1-em">
+                <div className="col-12 offset-sm-2 col-sm-8 offset-md-2 col-md-8 offset-lg-3 col-lg-6 m-b-1-em">
                   <div className="mdl-card mdl-shadow--4dp p-t-05-em p-l-1-em p-r-1-em p-b-05-em">
                     <MassageForm
                       updateTitleState={this.updateTitleState}
@@ -106,10 +109,10 @@ class ManageMassagePage extends React.Component {
                       massage={this.state.massage}
                       errors={this.state.errors}
                       saving={this.state.saving}
-                      />
-                      <Link className="text-right" to="" onClick={this.addRow} >
-                        <button type="button" className="btn btn-success btn-circle-lg" title="Add Row"><i className="glyphicon glyphicon-plus"></i></button>
-                      </Link>
+                    />
+                    <Link className="text-right" to="" onClick={this.addRow} >
+                      <button type="button" className="btn btn-success btn-circle-lg" title="Add Row"><i className="glyphicon glyphicon-plus"></i></button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -132,37 +135,38 @@ ManageMassagePage.contextTypes = {
 
 
 function getMassageByTypeAndId(massageTypes, type, id) {
-    const massageType = massageTypes.filter(massageType => massageType.type == type);
-    const massage = massageType[0].massages.filter(massage => massage.id == id);
-      if (massage.length) {
-        return massage[0];
-      }
+  const massageType = massageTypes.filter(massageType => massageType.type == type);
+  const massage = massageType[0].massages.filter(massage => massage.id == id);
+  if (massage.length) {
+    return massage[0];
+  }
 
-    return null;
+  return null;
 }
 
 function mapStateToProps(state, ownProps) {
-  const massageTypeId = ownProps.params.type;
-  const massageId = ownProps.params.id;
+  const massageTypeId = ownProps.params ? ownProps.params.type : undefined;
+  const massageId = ownProps.params ? ownProps.params.id : undefined;
 
-  let massage = { 
-    id: '', 
-    type: massageTypeId,
-    session_time: '', 
-    title: '', 
-    description: '', 
-    cost: '', 
-    icon: 'whitearomaoil.png', 
-    iconHeight: '3em', 
-    iconWidth: '1.8em', 
-    massage_details: [{ 
-      id: '', 
-      title: '', 
-      description: '' }] 
-    };
+  let massage = {
+    id: '',
+    type: massageTypeId || '',
+    session_time: '',
+    title: '',
+    description: '',
+    cost: '',
+    icon: 'whitearomaoil.png',
+    iconHeight: '3em',
+    iconWidth: '1.8em',
+    massage_details: [{
+      id: '',
+      title: '',
+      description: ''
+    }]
+  };
 
   if (massageTypeId && massageId && state.massageTypes.length > 0) {
-      massage = getMassageByTypeAndId(state.massageTypes, massageTypeId, massageId);
+    massage = getMassageByTypeAndId(state.massageTypes, massageTypeId, massageId);
   }
 
   return {

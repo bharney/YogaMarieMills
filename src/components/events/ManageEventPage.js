@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as eventActions from '../../actions/eventActions';
@@ -105,11 +106,11 @@ class ManageEventPage extends React.Component {
     this.setState({ eventType });
     this.props.actions.saveEvent(this.state.eventType);
     function replaceAll(str, find, replace) {
-                return str.replace(new RegExp(find, 'g'), replace);
+      return str.replace(new RegExp(find, 'g'), replace);
     }
 
     const generateType = (eventType) => {
-        return replaceAll(eventType.header, ' ', '-');
+      return replaceAll(eventType.header, ' ', '-');
     };
     eventType.type = generateType(eventType);
 
@@ -160,7 +161,7 @@ class ManageEventPage extends React.Component {
   }
 
   render() {
-    const {authorized} = this.props;
+    const { authorized } = this.props;
     return (
       <EventForm
         authorized={authorized}

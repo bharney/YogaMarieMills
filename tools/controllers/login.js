@@ -1,6 +1,6 @@
 import express from 'express';
 import sql from 'mssql';
-import {secret, dbconfig} from '../../secrets';
+import { secret, dbconfig } from '../../secrets';
 import jwt from 'jwt-simple';
 import bcrypt from 'bcrypt-nodejs';
 import moment from 'moment';
@@ -37,21 +37,20 @@ let loginRoutes = function () {
                                 FROM Users
                                 WHERE emailAddress = @emailAddress`
                 ).then(function (recordset) {
-                    if (recordset[0].emailAddress) {
-
-                        bcrypt.compare(user.password, recordset[0].password, function (err, isMatch) {
-                            if (err) return;
-
-                            if (!isMatch) {
-                                res.send(401, { message: "Email Address or Password is incorrect."})
-                            } else {
-                                createToken(recordset[0], res, req)
-                            }
-                        });
+                    if (!recordset || recordset.length === 0 || !recordset[0].emailAddress) {
+                        return res.send(401, { message: "Email Address is incorrect." });
                     }
-                    else {
-                        res.send(401, { message: "Email Address or Password is incorrect."});
-                    }
+
+                    console.log("password: " + user.password)
+                    bcrypt.compare(user.password, recordset[0].password, function (err, isMatch) {
+                        if (err) return;
+
+                        if (!isMatch) {
+                            res.send(401, { message: "Password is incorrect." })
+                        } else {
+                            createToken(recordset[0], res, req)
+                        }
+                    });
                 }).catch(function (err) {
                     console.log("login: " + err);
                 });

@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as costActions from '../../actions/costActions';
@@ -14,18 +15,18 @@ class ManageCostPage extends React.Component {
       errors: {},
       saving: false
     };
-    
+
     this.saveCost = this.saveCost.bind(this);
     this.deleteCost = this.deleteCost.bind(this);
     this.updateCostState = this.updateCostState.bind(this);
     this.uploadImage = this.uploadImage.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-        if (this.props.cost.id != nextProps.cost.id) {
-            this.setState({ cost: Object.assign({}, nextProps.cost) });
-        }
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (this.props.cost.id != nextProps.cost.id) {
+      this.setState({ cost: Object.assign({}, nextProps.cost) });
     }
+  }
 
   updateCostState(event) {
     const field = event.target.name;
@@ -36,16 +37,15 @@ class ManageCostPage extends React.Component {
 
   saveCost(event) {
     event.preventDefault();
-    let cost = this.state.cost;
-    this.setState({ cost: cost });
-    this.props.actions.saveCost(this.state.cost);
-    this.context.router.push('/YogaThurles/Costs');
+    this.props.actions.saveCost(this.state.cost).then(() => {
+      this.context.router.push('/YogaThurles/Costs');
+    });
   }
 
   deleteCost() {
-        this.props.actions.deleteCost(this.state.cost.id);
-        this.props.actions.loadCost();
-        this.context.router.push('/YogaThurles/Costs');
+    this.props.actions.deleteCost(this.state.cost.id).then(() => {
+      this.context.router.push('/YogaThurles/Costs');
+    });
   }
 
   uploadImage(e) {
@@ -65,7 +65,7 @@ class ManageCostPage extends React.Component {
 
 
   render() {
-    const {authorized} = this.props;
+    const { authorized } = this.props;
     return (
       <CostForm
         authorized={authorized}
@@ -76,7 +76,7 @@ class ManageCostPage extends React.Component {
         errors={this.state.errors}
         saving={this.state.saving}
         uploadImage={this.uploadImage}
-        />
+      />
     );
   }
 }
@@ -91,32 +91,32 @@ ManageCostPage.contextTypes = {
 };
 
 function getCostById(costs, id) {
-    const cost = costs.filter(cost => cost.id == id);
-    if (cost.length) {
-        return cost[0];
-    }
+  const cost = costs.filter(cost => cost.id == id);
+  if (cost.length) {
+    return cost[0];
+  }
 
-    return null;
+  return null;
 }
 
 function mapStateToProps(state, ownProps) {
-    const costId = ownProps.params.id;
-    let cost = { id: '', title: '', image: '', description: '', href: '', route: '', component: '' };
-    if (costId && state.costs.length > 0) {
-        cost = getCostById(state.costs, costId);
-    }
+  const costId = ownProps.params.id;
+  let cost = { id: '', title: '', image: '', description: '', href: '', route: '', component: '' };
+  if (costId && state.costs.length > 0) {
+    cost = getCostById(state.costs, costId);
+  }
 
-    return {
-        cost: cost,
-        authorized: state.authToken
-    };
+  return {
+    cost: cost,
+    authorized: state.authToken
+  };
 }
 
 function mapDispatchToProps(dispatch) {
-    return {
-        actions: bindActionCreators(costActions, dispatch),
-        upload: bindActionCreators(uploadActions, dispatch)
-    };
+  return {
+    actions: bindActionCreators(costActions, dispatch),
+    upload: bindActionCreators(uploadActions, dispatch)
+  };
 }
 
 

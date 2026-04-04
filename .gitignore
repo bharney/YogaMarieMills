@@ -39,5 +39,12 @@ dist
 # Mac files
 .DS_Store
 
-#config file.
-secrets.js
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+
+## dist files
+dist-server
+deployed

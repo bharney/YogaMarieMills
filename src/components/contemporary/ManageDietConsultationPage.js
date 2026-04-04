@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as dietConsultationActions from '../../actions/dietConsultationActions';
@@ -123,8 +124,11 @@ class ManageDietConsultationPage extends React.Component {
     }
     dietConsultation.description = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
     this.setState({ dietConsultation });
-    this.props.actions.saveDietConsultation(this.state.dietConsultation);
-    this.context.router.push('/Ayurveda/DietConsultation');
+    this.props.actions.saveDietConsultation(this.state.dietConsultation)
+      .then(() => this.props.actions.loadDietConsultation())
+      .then(() => {
+        this.context.router.push('/Ayurveda/DietConsultation');
+      });
   }
 
   addRow(e) {
@@ -153,13 +157,13 @@ class ManageDietConsultationPage extends React.Component {
   }
 
   render() {
-    const {authorized} = this.props;
+    const { authorized } = this.props;
     return (
       <div className="mdl-grid dark-color">
         <div className="ribbon bg-image-landing">
           <div className="container-fluid">
             <div className="row">
-              <div className="col-xs-12 col-sm-offset-1 col-sm-10 m-b-1-em">
+              <div className="col-12 offset-sm-1 col-sm-10 m-b-1-em">
                 <Admin saveAction={this.saveDietConsultation} authorized={authorized} />
                 <br />
                 <br />
@@ -178,7 +182,7 @@ class ManageDietConsultationPage extends React.Component {
                   onChange={this.onChange}
                   editorState={this.state.editorState}
                   ref="editor"
-                  focus={focus}
+                  focus={this.focus}
                 />
               </div>
             </div>

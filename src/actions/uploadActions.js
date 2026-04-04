@@ -8,6 +8,7 @@ export function uploadFile(file) {
     return function (dispatch) {
       return uploadApi.uploadFile(file).then(fileUploaded => {
         dispatch(uploadFileSuccess(fileUploaded));
+        return fileUploaded;
     }).catch(error => {
       throw(error);
     });

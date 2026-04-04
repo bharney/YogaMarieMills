@@ -3,7 +3,7 @@ import { getToken } from '../actions/authTokenActions';
 class EventApi {
   static getAllItems() {
     return new Promise((resolve) => {
-      fetch('http://localhost:3000/api/events').then(function (response) {
+      fetch('/api/events').then(function (response) {
         return response.json();
       }).then(function (eventTypes) {
 
@@ -16,7 +16,7 @@ class EventApi {
     eventType = Object.assign({}, eventType);
     return new Promise((resolve) => {
       if (eventType.id) {
-        fetch('http://localhost:3000/api/events', {
+        fetch('/api/events', {
           method: 'put',
           headers: {
             'Accept': 'application/json, text/plain, */*',
@@ -32,7 +32,7 @@ class EventApi {
           console.log('Request failed', error);
         });
       } else {
-        fetch('http://localhost:3000/api/events', {
+        fetch('/api/events', {
           method: 'post',
           headers: {
             'Accept': 'application/json, text/plain, */*',
@@ -55,7 +55,7 @@ class EventApi {
     return new Promise((resolve) => {
       if (confirm("Are you sure you want to delete this event forever?")) {
         if (eventType.id && eventType.type) {
-          fetch('http://localhost:3000/api/events/', {
+          fetch('/api/events/', {
             method: 'delete',
             headers: {
               'Accept': 'application/json, text/plain, */*',

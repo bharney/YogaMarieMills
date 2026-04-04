@@ -29,8 +29,7 @@ export function loadCost() {
 export function deleteCost(cost) {
   return function (dispatch) {
     return costApi.deleteCost(cost).then(() => {
-      dispatch(deleteCostSuccess());
-      return costApi.getAllCosts().then(costs => {
+      return costApi.getAllItems().then(costs => {
         dispatch(loadCostSuccess(costs));
       });
     }).catch(error => {
@@ -42,9 +41,10 @@ export function deleteCost(cost) {
 
 export function saveCost(cost) {
   return function (dispatch) {
-    return costApi.saveCost(cost).then(savedCost => {
-      cost.id ? dispatch(updateCostSuccess(savedCost)) :
-        dispatch(createCostSuccess(savedCost));
+    return costApi.saveCost(cost).then(() => {
+      return costApi.getAllItems().then(costs => {
+        dispatch(loadCostSuccess(costs));
+      });
     }).catch(error => {
       throw (error);
     });

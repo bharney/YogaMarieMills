@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -10,6 +11,10 @@ class CostsPage extends React.Component {
         super(props, context);
     }
 
+    componentDidMount() {
+        this.props.actions.loadCost();
+    }
+
     render() {
         const { costs } = this.props;
         const { authorized } = this.props;
@@ -18,26 +23,26 @@ class CostsPage extends React.Component {
                 <div className="container-fluid p-t-3-em p-l-0 p-r-0 color-blur">
                     <div className="ribbon bg-image-landing b-border">
                         <div className="row m-l-0 m-r-0">
-                            <div className="col-sm-offset-1 col-sm-10 col-xs-12 row-centered">
+                            <div className="col-sm-offset-1 col-sm-10 col-12 row-centered">
                                 <h1 className="color-white">Pricing</h1>
                                 <Admin addAction="Cost" authorized={authorized} />
                                 <hr width="50%" className="center-block m-t-0" />
-                                
-                                        <h3 className="text-center color-white">
-                                        Every class runs for no less than 60 minutes unless stated, ands sometimes
-                                        may run over time. Best of all, should you miss a class in the course you paid for,
-                                        you can replace it with a class on another day and time of your series, provided there is room.
+
+                                <h3 className="text-center color-white">
+                                    Every class runs for no less than 60 minutes unless stated, ands sometimes
+                                    may run over time. Best of all, should you miss a class in the course you paid for,
+                                    you can replace it with a class on another day and time of your series, provided there is room.
                             </h3>
                                 {costs.map(cost =>
-                                    <div className="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-centered">
-                                        <Admin editAction={cost.type + "/" + cost.id} authorized={authorized} />
+                                    <div key={cost.id} className="col-12 col-sm-6 col-md-6 col-lg-4 col-centered">
+                                        <Admin editAction={(cost.type || 'Cost') + "/" + cost.id} authorized={authorized} />
                                         <div className="mdl-card mdl-shadow--4dp m-t-05-em m-b-05-em bg-white color-black cost-tile text-center">
                                             <div className="inner">
                                                 <div className="top">
                                                     <span>{cost.package}</span>
                                                 </div>
                                                 <div className="row p-t-1-em">
-                                                    <div className="col-xs-12">
+                                                    <div className="col-12">
                                                         <h3>{cost.description}</h3>
                                                         <h4>{cost.cost}</h4>
                                                         <h4>{cost.duration}</h4>
@@ -55,12 +60,12 @@ class CostsPage extends React.Component {
                                 }
                             </div>
                         </div>
-                        
+
                         <h2 className="text-center color-white">Additional Info</h2>
                         <hr width="50%" className="center-block" />
                         <div className="container-fluid">
                             <div className="row">
-                                <div className="col-sm-offset-1 col-sm-10 col-xs-12">
+                                <div className="col-sm-offset-1 col-sm-10 col-12">
                                     <div className="mdl-card container p-1-em m-b-1-em m-t-1-em mdl-shadow--4dp">
                                         <div className="featured clearfix text-center color-black">
 
@@ -91,7 +96,7 @@ class CostsPage extends React.Component {
 CostsPage.propTypes = {
     costs: PropTypes.array.isRequired,
     actions: PropTypes.object.isRequired
-}
+};
 
 function mapStateToProps(state) {
     return {

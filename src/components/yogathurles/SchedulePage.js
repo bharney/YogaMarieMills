@@ -1,29 +1,30 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 
-const SchedulePage = ({schedule}) => {
+const SchedulePage = ({ schedule }) => {
   return (
-      <table className="table table-hover">
-        <thead>
+    <table className="table table-hover">
+      <thead>
+        <tr>
+          <th colSpan="2">
+            <h4 className="p-t-0 p-b-0"><strong>{schedule.session_date}</strong></h4>
+          </th>
+        </tr>
+      </thead>
+      {schedule.session_details.map(session_details =>
+        <tbody>
           <tr>
-            <th colSpan="2">
-              <h4 className="p-t-0 p-b-0"><strong>{schedule.session_date}</strong></h4>
-            </th>
+            <td className="text-left">
+              <h4 className="p-t-0 p-b-0">{session_details.session_time}</h4>
+            </td>
+            <td className="text-right">
+              <h4 className="p-t-0 p-b-0">{session_details.class}</h4>
+            </td>
           </tr>
-        </thead>
-        {schedule.session_details.map(session_details =>
-          <tbody>
-            <tr>
-              <td className="text-left">
-                <h4 className="p-t-0 p-b-0">{session_details.session_time}</h4>
-              </td>
-              <td className="text-right">
-                <h4 className="p-t-0 p-b-0">{session_details.class}</h4>
-              </td>
-            </tr>
-          </tbody>)
-        }
-      </table>
+        </tbody>)
+      }
+    </table>
   );
 }
 

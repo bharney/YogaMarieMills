@@ -10,6 +10,8 @@ const app = express();
 
 app.use(compression());
 app.use(express.static('dist-server'));
+app.use('/images', express.static(path.join(__dirname, '../uploaded-images')));
+app.use('/images', express.static(path.join(__dirname, '../src/images')));
 
 app.use(bodyParser.urlencoded({ express: true }));
 app.use(bodyParser.json());

@@ -17,6 +17,8 @@ app.use(require('webpack-dev-middleware')(compiler, {
 }));
 
 app.use(require('webpack-hot-middleware')(compiler));
+app.use('/images', express.static(path.join(__dirname, '../uploaded-images')));
+app.use('/images', express.static(path.join(__dirname, '../src/images')));
 
 app.use(bodyParser.urlencoded({ express: true }));
 app.use(bodyParser.json());
@@ -50,7 +52,7 @@ app.use('/api', blogRouter(),
 app.get('*', function (req, res) {
     res.sendFile(path.join(__dirname, '../src/index.html'));
 });
- 
+
 app.listen(port, function (err) {
     if (err) {
         console.log(err);

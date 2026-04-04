@@ -3,10 +3,10 @@ import { getToken } from '../actions/authTokenActions';
 class ScheduleApi {
   static getAllItems() {
     return new Promise((resolve) => {
-      fetch('http://localhost:3000/api/schedules').then(function (response) {
+      fetch('/api/schedules').then(function (response) {
         return response.json();
       }).then(function (schedules) {
-        resolve(Object.assign([], schedules));
+        resolve(Object.assign({}, schedules));
       });
     });
   }
@@ -14,10 +14,10 @@ class ScheduleApi {
   static getItem(scheduleId) {
     return new Promise((resolve) => {
       if (scheduleId) {
-        fetch('http://localhost:3000/api/schedules/' + scheduleId).then(function (response) {
+        fetch('/api/schedules/' + scheduleId).then(function (response) {
           return response.json();
-        }).then(function (schedules) {
-          resolve(Object.assign([], schedules));
+        }).then(function (schedule) {
+          resolve(Object.assign({}, schedule));
         });
       }
     });
@@ -27,7 +27,7 @@ class ScheduleApi {
     schedule = Object.assign({}, schedule);
     return new Promise((resolve) => {
       if (schedule.id) {
-        fetch('http://localhost:3000/api/schedules', {
+        fetch('/api/schedules', {
           method: 'put',
           headers: {
             'Accept': 'application/json, text/plain, */*',
@@ -43,7 +43,7 @@ class ScheduleApi {
           console.log('Request failed', error);
         });
       } else {
-        fetch('http://localhost:3000/api/schedules', {
+        fetch('/api/schedules', {
           method: 'post',
           headers: {
             'Accept': 'application/json, text/plain, */*',
@@ -66,7 +66,7 @@ class ScheduleApi {
     return new Promise((resolve) => {
       if (confirm("Are you sure you want to delete this schedule forever?")) {
         if (scheduleId) {
-          fetch('http://localhost:3000/api/schedules/' + scheduleId, {
+          fetch('/api/schedules/' + scheduleId, {
             method: 'delete',
             headers: {
               'Accept': 'application/json, text/plain, */*',

@@ -1,9 +1,9 @@
 import React from 'react';
-import DatePicker from 'material-ui/DatePicker';
+import PropTypes from 'prop-types';
 import TextInput from '../common/TextInput';
 import RemoveRowButton from '../common/RemoveRowButton';
 
-const ScheduleForm = ({updateClassState, updateDateState, updateScheduleTimeState, removeRow, schedule}) => {
+const ScheduleForm = ({ updateClassState, updateScheduleTimeState, removeRow, schedule }) => {
 
   const vertAlign = {
     verticalAlign: "middle"
@@ -15,7 +15,7 @@ const ScheduleForm = ({updateClassState, updateDateState, updateScheduleTimeStat
         <thead>
           <tr>
             <th colSpan="2">
-              <DatePicker
+              {/* <DatePicker
                 formatDate={new Intl.DateTimeFormat('en-US', {
                   weekday: 'long',
                   day: 'numeric',
@@ -24,22 +24,22 @@ const ScheduleForm = ({updateClassState, updateDateState, updateScheduleTimeStat
                 }).format}
                 hintText="Date"
                 value={schedule.session_date == '' ? new Date() : new Date(schedule.session_date)} name="session_date"
-                onChange={updateDateState} />
+                onChange={updateDateState} /> */}
             </th>
           </tr>
         </thead>
         {schedule.session_details.map((session_details, index) =>
-          <tbody>
+          <tbody key={`session-row-${index}`}>
             <tr>
               <td style={vertAlign} className="text-center">
                 <RemoveRowButton
-                  name={index}
+                  name={String(index)}
                   onClick={removeRow} />
               </td>
               <td>
                 <TextInput
                   className="p-t-0 p-b-0"
-                  name={index}
+                  name={String(index)}
                   label="Time"
                   placeholder="Time"
                   value={session_details.session_time}
@@ -48,7 +48,7 @@ const ScheduleForm = ({updateClassState, updateDateState, updateScheduleTimeStat
               <td>
                 <TextInput
                   className="p-t-0 p-b-0"
-                  name={index}
+                  name={String(index)}
                   label="Class"
                   placeholder="Class"
                   value={session_details.class}
@@ -63,11 +63,14 @@ const ScheduleForm = ({updateClassState, updateDateState, updateScheduleTimeStat
 };
 
 ScheduleForm.propTypes = {
-  schedule: React.PropTypes.object.isRequired,
-  updateScheduleState: React.PropTypes.object.isRequired,
-  saving: React.PropTypes.object.isRequired,
-  saveSchedule: React.PropTypes.func.isRequired,
-  errors: React.PropTypes.object
+  schedule: PropTypes.object.isRequired,
+  updateClassState: PropTypes.func.isRequired,
+  updateScheduleTimeState: PropTypes.func.isRequired,
+  removeRow: PropTypes.func.isRequired,
+  updateDateState: PropTypes.func,
+  saving: PropTypes.bool,
+  saveSchedule: PropTypes.func,
+  errors: PropTypes.object,
 };
 
 export default ScheduleForm;

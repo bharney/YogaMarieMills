@@ -3,7 +3,7 @@ import { getToken } from '../actions/authTokenActions';
 class BlogApi {
     static getAllBlogs() {
         return new Promise((resolve) => {
-            fetch('http://localhost:3000/api/blogs').then(function (response) {
+            fetch('/api/blogs').then(function (response) {
                 return response.json();
             }).then(function (blogs) {
                 resolve(Object.assign([], blogs));
@@ -20,7 +20,7 @@ class BlogApi {
             }
 
             if (blog.id) {
-                fetch('http://localhost:3000/api/blogs', {
+                fetch('/api/blogs', {
                     method: 'put',
                     headers: {
                         'Accept': 'application/json, text/plain, */*',
@@ -36,7 +36,7 @@ class BlogApi {
                     console.log('Request failed', error);
                 });
             } else {
-                fetch('http://localhost:3000/api/blogs', {
+                fetch('/api/blogs', {
                     method: 'post',
                     headers: {
                         'Accept': 'application/json, text/plain, */*',
@@ -59,7 +59,7 @@ class BlogApi {
         return new Promise((resolve) => {
             if (confirm("Are you sure you want to delete this blog forever?")) {
                 if (blogId) {
-                    fetch('http://localhost:3000/api/blogs/' + blogId, {
+                    fetch('/api/blogs/' + blogId, {
                         method: 'delete',
                         headers: {
                             'Accept': 'application/json, text/plain, */*',

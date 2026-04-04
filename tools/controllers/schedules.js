@@ -29,9 +29,13 @@ let scheduleRoutes = function () {
                 request.input('session_date', sql.Date, schedule.session_date);
                 request.query(
                     `INSERT INTO Schedules (type, session_date)
-                     VALUES (@type, @session_date); 
+                     VALUES (@type, @session_date);
                      SELECT SCOPE_IDENTITY() AS parent_id;`
                 ).then(function (recordset) {
+                    if (!recordset || recordset.length === 0) {
+                        return res.status(500).send('Unable to create schedule parent row.');
+                    }
+
                     for (let prop in schedule.session_details) {
                         if (schedule.session_details.hasOwnProperty(prop)) {
                             const sqlInsertScheduleDetails = new sql.Connection(dbconfig, function () {
@@ -51,8 +55,14 @@ let scheduleRoutes = function () {
                             });
                         }
                     }
+
+                    res.status(201).json({
+                        ...schedule,
+                        id: recordset[0].parent_id
+                    });
                 }).catch(function (err) {
                     console.log("schedules: " + err);
+                    res.status(500).send("Unable to save schedule.");
                 });
             });
         })
@@ -110,7 +120,7 @@ let scheduleRoutes = function () {
                                                     console.log("update scheduleDetails: " + err);
                                                 });
                                             });
-                                        } 
+                                        }
                                         else {
                                         const sqlInsertScheduleDetails = new sql.Connection(dbconfig, function () {
                                             let request = new sql.Request(sqlInsertScheduleDetails);
@@ -128,13 +138,16 @@ let scheduleRoutes = function () {
                                         });
                                     }
                                 }
-                            }          
+                            }
                         }).catch(function (err) {
                             console.log("schedule delete" + err);
                         });
                     });
+
+                    res.status(201).json(schedule);
                 }).catch(function (err) {
                         console.log("schedule " + err);
+                        res.status(500).send("Unable to update schedule.");
                 });
             })
         })
@@ -182,7 +195,7 @@ let scheduleRoutes = function () {
 
                         UNION ALL
 
-                        SELECT 
+                        SELECT
                         S.id
                         ,S.type AS type
                         ,NULL as venue
@@ -195,10 +208,10 @@ let scheduleRoutes = function () {
                         ,NULL AS parent_id
                         FROM Schedules S
                         WHERE session_date >= DATEADD(day, DATEDIFF(day, 0, GETDATE()), 0)
-                                                
+
                         UNION ALL
 
-                        SELECT 
+                        SELECT
                         D.id
                         ,D.type AS type
                         ,NULL as venue
@@ -212,6 +225,17 @@ let scheduleRoutes = function () {
                         FROM ScheduleDetails D
                         ORDER BY header desc, DateSort`
                 ).then(function (recordset) {
+                    if (!recordset || recordset.length === 0) {
+                        return res.json({
+                            id: null,
+                            type: 'Schedule',
+                            header: '',
+                            venue: '',
+                            description: '',
+                            session_dates: []
+                        });
+                    }
+
                     let schedulePage = {
                         id: recordset[0].id,
                         type: recordset[0].type,
@@ -275,7 +299,7 @@ let scheduleRoutes = function () {
 
                         UNION ALL
 
-                        SELECT 
+                        SELECT
                         D.id
                         ,D.type AS type
                         ,NULL AS session_date

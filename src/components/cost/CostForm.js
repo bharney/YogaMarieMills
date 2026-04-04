@@ -1,23 +1,24 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import TextInput from '../common/TextInput';
 import Admin from '../common/Admin';
 
-const CostForm = ({updateCostState, saveCost, cost, deleteCost, authorized}) => {
+const CostForm = ({ updateCostState, saveCost, cost, deleteCost, authorized }) => {
 
   return (
     <div className="mdl-grid dark-color bg-color">
       <div className="ribbon bg-image-landing b-border">
         <div className="row">
-          <div className="col-xs-offset-1 col-xs-10 row-centered">
+          <div className="col-offset-1 col-10 row-centered">
             <h1 className="color-white">Pricing</h1>
             <hr width="50%" className="center-block" />
             <form>
               <Admin saveAction={saveCost} deleteAction={deleteCost} authorized={authorized} />
-              <div className="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-centered">
+              <div className="col-12 col-sm-6 col-md-6 col-lg-4 col-centered">
                 <div className="mdl-card mdl-shadow--4dp m-l-30 m-r-30 m-t-15 m-b-15 bg-white color-black cost-tile text-center">
                   <div className="inner">
                     <div className="row p-t-40">
-                    <div className="col-xs-12">
+                      <div className="col-12">
                         <TextInput
                           name="package"
                           label="Package"
@@ -58,15 +59,14 @@ const CostForm = ({updateCostState, saveCost, cost, deleteCost, authorized}) => 
 };
 
 CostForm.propTypes = {
-  cost: React.PropTypes.object.isRequired,
-  editorState: React.PropTypes.object.isRequired,
-  updateCostState: React.PropTypes.object.isRequired,
-  focus: React.PropTypes.object.isRequired,
-  saving: React.PropTypes.object.isRequired,
-  uploadImage: React.PropTypes.object.isRequired,
-  saveCost: React.PropTypes.func.isRequired,
-  onChange: React.PropTypes.func.isRequired,
-  errors: React.PropTypes.object
+  cost: PropTypes.object.isRequired,
+  updateCostState: PropTypes.func.isRequired,
+  saving: PropTypes.bool.isRequired,
+  uploadImage: PropTypes.func,
+  saveCost: PropTypes.func.isRequired,
+  deleteCost: PropTypes.func.isRequired,
+  authorized: PropTypes.object,
+  errors: PropTypes.object
 };
 
 export default CostForm;

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import TextInput from '../common/TextInput';
 import TextAreaInput from '../common/TextAreaInput';
 import RemoveRowButton from '../common/RemoveRowButton';
@@ -17,14 +18,14 @@ const ConsultationDetailsForm = ({ updateTitleState, updateCostState, updateSess
   }
   return (
     <div className="row">
-      <div className="col-xs-12 col-sm-offset-1 col-sm-10">
+      <div className="col-12 offset-sm-1 col-sm-10">
         {dietConsultation.consultationDetails.map((consultationDetails, index) =>
-          <div className="col-xs-12 col-sm-6">
+          <div className="col-12 col-sm-6">
             <div className="mdl-card mdl-shadow--8dp bright-bg-color m-t-1-em p-1-em allow-overflow">
               {displayIcon(consultationDetails.icon, consultationDetails.iconWidth, consultationDetails.iconHeight)}
               <RemoveRowButton
                 name={index}
-                onClick={removeRow}/>
+                onClick={removeRow} />
               <TextInput
                 className="p-t-0 p-b-0"
                 name={index}
@@ -70,11 +71,11 @@ const ConsultationDetailsForm = ({ updateTitleState, updateCostState, updateSess
 };
 
 ConsultationDetailsForm.propTypes = {
-  dietConsultation: React.PropTypes.object.isRequired,
-  updateDietConsultationState: React.PropTypes.object.isRequired,
-  saving: React.PropTypes.object.isRequired,
-  saveDietConsultation: React.PropTypes.func.isRequired,
-  errors: React.PropTypes.object
+  dietConsultation: PropTypes.object.isRequired,
+  updateDietConsultationState: PropTypes.object.isRequired,
+  saving: PropTypes.object.isRequired,
+  saveDietConsultation: PropTypes.func.isRequired,
+  errors: PropTypes.object
 };
 
 export default ConsultationDetailsForm;

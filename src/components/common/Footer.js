@@ -15,7 +15,7 @@ class Footer extends React.Component {
             <footer>
                 <div className="container-fluid light-bg-color p-2-em">
                     <div className="row">
-                        <div className="col-xs-12 col-sm-12 text-center">
+                        <div className="col-12 col-sm-12 text-center">
                             <span>
                                 <p className="m-0">
                                     Marie Mills &nbsp; | &nbsp; <i className="fa fa-phone" aria-hidden="true"></i> 086-1778369 &nbsp; | &nbsp;
@@ -24,7 +24,7 @@ class Footer extends React.Component {
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col-xs-12 col-sm-12 text-center">
+                        <div className="col-12 col-sm-12 text-center">
                             <span>
                                 <p className="m-0 m-t-1-em">
                                     <a href="http://www.http://yogamariemills.com">Copyright @ {new Date().getFullYear()} Yoga Marie Mills</a> &nbsp; | &nbsp;

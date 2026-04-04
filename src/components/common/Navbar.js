@@ -1,4 +1,5 @@
-﻿import React, {PropTypes} from 'react';
+﻿import React from 'react';
+import PropTypes from 'prop-types';
 
 class Navbar extends React.Component {
 
@@ -15,10 +16,10 @@ class Navbar extends React.Component {
     handleClose() { this.setState({ open: false }); }
 
     render() {
-        const {item} = this.props;
+        const { item } = this.props;
 
         return (
-            <MenuItem key={item.route} primaryText={item.name} onTouchTap={this.handleClose.bind(this) }>{item.name}</MenuItem>
+            <MenuItem key={item.route} primaryText={item.name} onClick={this.handleClose.bind(this)}>{item.name}</MenuItem>
         );
     }
 }

@@ -58,7 +58,7 @@ let testimonialRoutes = function () {
                 request.input('description', sql.VarChar, testimonial.description);
                 request.input('type', sql.VarChar, 'Testimonial');
                 request.query(
-                    `UPDATE Headers 
+                    `UPDATE Headers
                      SET short = @short
                      ,description = @description
                      FROM Headers
@@ -88,7 +88,7 @@ let testimonialRoutes = function () {
                                                     console.log("update TestimonialDetails: " + err);
                                                 });
                                             });
-                                        } 
+                                        }
                                         else {
                                         const sqlInsertTestimonial = new sql.Connection(dbconfig, function () {
                                             let request = new sql.Request(sqlInsertTestimonial);
@@ -105,7 +105,7 @@ let testimonialRoutes = function () {
                                         });
                                     }
                                 }
-                            }          
+                            }
                         }).catch(function (err) {
                             console.log("Testimonial delete" + err);
                         });
@@ -114,7 +114,7 @@ let testimonialRoutes = function () {
                         console.log("Testimonial Header: " + err);
                 });
             })
-        })    
+        })
         .delete(function (req, res) {
             if (!req.headers.authorization) {
                 return res.status(401).send({ message: "You are not authorized" })
@@ -164,6 +164,15 @@ let testimonialRoutes = function () {
                         ,T.name AS name
                         FROM Testimonials T`
                 ).then(function (recordset) {
+                    if (!recordset || recordset.length === 0) {
+                        return res.json({
+                            header: '',
+                            short: '',
+                            description: '',
+                            testimonial_details: []
+                        });
+                    }
+
                     let testimonials = {
                         header: recordset[0].header,
                         short: recordset[0].short,

@@ -1,6 +1,7 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const RemoveRowButton = ({name, onClick}) => {
+const RemoveRowButton = ({ name, onClick }) => {
   return (
     <button
       type="button"
@@ -13,8 +14,8 @@ const RemoveRowButton = ({name, onClick}) => {
 };
 
 RemoveRowButton.propTypes = {
-  name: PropTypes.string.isRequired,
-  removeRow: PropTypes.func.isRequired,
+  name: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  onClick: PropTypes.func.isRequired,
 };
 
 export default RemoveRowButton;

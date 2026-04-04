@@ -1,12 +1,13 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Link, IndexLink, browserHistory } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as navbarActions from '../../actions/navbarActions';
-import MenuItem from 'material-ui/MenuItem';
-import Drawer from 'material-ui/Drawer';
-import { ListItem } from 'material-ui/List';
-import { Nav, NavItem, NavDropdown } from 'react-bootstrap';
+import MenuItem from '@material-ui/core/MenuItem';
+import Drawer from '@material-ui/core/Drawer';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 import logoImg from '../../images/mobileLogo.png';
 
 class Header extends React.Component {
@@ -20,6 +21,7 @@ class Header extends React.Component {
         this.handleToggle = this.handleToggle.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.preventRedirect = this.preventRedirect.bind(this);
+        this.normalizeRoute = this.normalizeRoute.bind(this);
     }
 
     handleToggle() {
@@ -42,6 +44,15 @@ class Header extends React.Component {
         e.preventDefault();
     }
 
+    normalizeRoute(route) {
+        if (!route || route === 'undefined') {
+            return '/';
+        }
+
+        const normalizedRoute = String(route).replace(/^\/+/, '');
+        return normalizedRoute ? `/${normalizedRoute}` : '/';
+    }
+
     render() {
         const styles = {
             fontWeight: 300
@@ -50,40 +61,55 @@ class Header extends React.Component {
         let that = this;
 
         let drawerItems = function (item) {
+            const itemRoute = that.normalizeRoute(item.route);
             if (!item.subMenu || item.subMenu.length == 0)
                 return (
-                    <Link key={item.route} to={'/' + item.route} >
-                        <MenuItem onTouchTap={that.handleToggle} key={item.route}>{item.name}</MenuItem>
+                    <Link key={item.route || item.name} to={itemRoute} className="drawer-link" >
+                        <MenuItem onClick={that.handleToggle} key={item.route}>{item.name}</MenuItem>
                     </Link>
                 );
 
             return (
-                <ListItem
-                    primaryText={item.name}
-                    initiallyOpen={false}
-                    style={styles}
-                    primaryTogglesNestedList
-                    nestedItems={[
-                        item.subMenu.map(subMenu => drawerItems(subMenu))
-                    ]} />
+                <div key={item.route || item.name}>
+                    <ListItem disabled>
+                        <ListItemText primary={item.name} style={styles} />
+                    </ListItem>
+                    {item.subMenu.map(subMenu => (
+                        <Link key={subMenu.route || subMenu.name} to={that.normalizeRoute(subMenu.route)} className="drawer-link">
+                            <MenuItem onClick={that.handleToggle} style={{ paddingLeft: '32px' }}>{subMenu.name}</MenuItem>
+                        </Link>
+                    ))}
+                </div>
             );
         };
 
-        let navItems = function (item) {
-            if (!item.subMenu || item.subMenu.length == 0)
+        let desktopNavItems = function (item) {
+            const itemRoute = that.normalizeRoute(item.route);
+            if (!item.subMenu || item.subMenu.length === 0) {
                 return (
-                    <NavItem eventKey={item.id} onTouchTap={() => that.redirectToNavbarItemPage(item)} className="dark-color nav-links hidden-xs hidden-sm">{item.name}</NavItem>
+                    <Link key={item.id || item.name} to={itemRoute} className="top-nav-link" onClick={that.handleClose}>
+                        {item.name}
+                    </Link>
                 );
+            }
+
             return (
-                <NavDropdown eventKey={item.id} pullRight={true} className="nav-links hidden-xs hidden-sm" title={item.name} id={item.id}>
-                    {item.subMenu.map(subMenu => navItems(subMenu))}
-                </NavDropdown>
+                <div key={item.id || item.name} className="top-nav-item">
+                    <span className="top-nav-trigger">{item.name}</span>
+                    <div className="top-nav-dropdown">
+                        {item.subMenu.map(subMenu => (
+                            <Link key={subMenu.id || subMenu.name} to={that.normalizeRoute(subMenu.route)} className="top-nav-dropdown-link" onClick={that.handleClose}>
+                                {subMenu.name}
+                            </Link>
+                        ))}
+                    </div>
+                </div>
             );
         };
         return (
             <header>
                 <div className="mdl-layout__header-row nav-element-left anchor dark-bg-color color-blur navbar-fixed-top mdl-shadow--4dp">
-                    <a className="navbar-brand mdl-layout-title mdl-layout__header-row drawer-header nav-menu-left" onTouchTap={this.handleToggle}><img className="m-0 p-b-5 brand img-responsive" src={logoImg}></img></a>
+                    <a className="navbar-brand mdl-layout-title mdl-layout__header-row drawer-header nav-menu-left" onClick={this.handleToggle}><img className="m-0 p-b-5 brand img-responsive" src={logoImg}></img></a>
                     <div className="mdl-layout-spacer nav-vertical-divider">
                         <div className="mdl-layout__header-row drawer-header anchor p-l-0">
                             <IndexLink to="/" className="mdl-layout-title nav-links p-r-1-em">
@@ -91,20 +117,17 @@ class Header extends React.Component {
                             </IndexLink>
                         </div>
                     </div>
-                    <Nav bsStyle="" className="inline-nav" activeKey="1" onSelect={this.handleClose}>
-                        {navbar_items.filter(item => item.subMenu).map(item =>
-                            navItems(item)
-                        )}
-                    </Nav>
+                    <div className="top-nav hidden-xs hidden-sm">
+                        {navbar_items.map(item => desktopNavItems(item))}
+                    </div>
                 </div>
                 <Drawer
-                    docked={false}
                     open={this.state.open}
-                    onRequestChange={this.handleToggle}>
+                    onClose={this.handleToggle}>
                     <header>
                         <div className="mdl-layout__header-row drawer-header color-blur anchor">
                             <IndexLink to="/">
-                                <span onTouchTap={this.handleToggle}>
+                                <span onClick={this.handleToggle}>
                                     <h4 className="m-0 p-t-05-em p-b-05-em p-l-03-em">
                                         Yoga with Marie Mills
                                     </h4>
@@ -112,7 +135,7 @@ class Header extends React.Component {
                             </IndexLink>
                         </div>
                     </header>
-                    <main className="inline-nav">
+                    <main className="drawer-nav">
                         {navbar_items.map(item =>
                             drawerItems(item)
                         )}

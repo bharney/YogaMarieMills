@@ -1,4 +1,5 @@
-﻿import React, { PropTypes } from 'react';
+﻿import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Admin from '../common/Admin';
@@ -10,17 +11,24 @@ class TestimonialPage extends React.Component {
         super(props, context);
     }
 
+    componentDidMount() {
+        if (!this.props.testimonials || !this.props.testimonials.header) {
+            this.props.actions.loadTestimonial();
+        }
+    }
+
     render() {
-        const { testimonials } = this.props;
-        if(!testimonials.testimonial_details)
-            testimonials.testimonial_details = [];
+        const testimonials = this.props.testimonials || { header: '', short: '', description: '', testimonial_details: [] };
+        const testimonialDetails = Array.isArray(testimonials.testimonial_details)
+            ? testimonials.testimonial_details
+            : [];
         const { authorized } = this.props;
         return (
             <div className="container-fluid p-l-0 p-r-0 p-t-4-em color-blur">
                 <div className="ribbon bg-image-landing">
                     <div className="container-fluid">
                         <div className="row m-t-1-em">
-                            <div className="col-sm-offset-1 col-sm-10 col-xs-12 m-b-1-em">
+                            <div className="col-sm-offset-1 col-sm-10 col-12 m-b-1-em">
                                 <h1 className="color-white text-center">{testimonials.header}</h1>
                                 <h3 className="color-white text-center">{testimonials.short}</h3>
                                 <div className="mdl-card mdl-shadow--4dp p-20">
@@ -40,7 +48,7 @@ class TestimonialPage extends React.Component {
                                     </div>
                                 </div>
                                 <div className="col-2-masonry">
-                                    {testimonials.testimonial_details.map(testimonial_details =>
+                                    {testimonialDetails.map(testimonial_details =>
                                         <div className="mdl-card mdl-shadow--4dp p-20 m-t-1-em tile-masonry bg-color-white">
                                             <ul className="mdl-list">
                                                 <li>
@@ -61,7 +69,7 @@ class TestimonialPage extends React.Component {
 }
 
 TestimonialPage.propTypes = {
-    testimonials: PropTypes.array.isRequired,
+    testimonials: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
 }
 

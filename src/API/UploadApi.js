@@ -2,19 +2,26 @@ import { getToken } from '../actions/authTokenActions';
 
 class UploadApi {
     static uploadFile(file) {
-        let data = new FormData()
-        data.append('file', file)
+        let data = new FormData();
+        data.append('file', file);
         return new Promise((resolve) => {
-            fetch('http://localhost:3000/api/uploads', {
+            fetch('/api/uploads', {
                 method: 'post',
                 headers: {
                     'Authorization': 'Bearer ' + getToken()
                 },
                 body: data
             }).then(function (response) {
-                resolve(response)
+                if (!response.ok) {
+                    throw new Error(`Upload failed with status ${response.status}`);
+                }
+
+                return response.json();
+            }).then(function (uploadedFile) {
+                resolve(uploadedFile);
             }).catch(function (error) {
                 console.log('Request failed', error);
+                throw error;
             });
         });
     }

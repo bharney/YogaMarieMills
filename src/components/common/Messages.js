@@ -1,6 +1,7 @@
-import React, {PropTypes} from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const Messages = (props) => {  
+const Messages = (props) => {
   const { messages } = props
   return (
     <div>
@@ -13,12 +14,12 @@ const Messages = (props) => {
   )
 }
 
-Messages.propTypes = {  
+Messages.propTypes = {
   messages: PropTypes.arrayOf(
-      PropTypes.shape({
-        body: PropTypes.string,
-        time: PropTypes.date,
-      })),
+    PropTypes.shape({
+      body: PropTypes.string,
+      time: PropTypes.date,
+    })),
 }
 
 export default Messages  

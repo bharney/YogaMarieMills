@@ -3,7 +3,7 @@ import { getToken } from '../actions/authTokenActions';
 class CostApi {
   static getAllItems() {
     return new Promise((resolve) => {
-      fetch('http://localhost:3000/api/costs').then(function (response) {
+      fetch('/api/costs').then(function (response) {
         return response.json();
       }).then(function (costs) {
         resolve(Object.assign([], costs));
@@ -15,7 +15,7 @@ class CostApi {
     cost = Object.assign({}, cost);
     return new Promise((resolve) => {
       if (cost.id) {
-        fetch('http://localhost:3000/api/costs', {
+        fetch('/api/costs', {
           method: 'put',
           headers: {
             'Accept': 'application/json, text/plain, */*',
@@ -31,7 +31,7 @@ class CostApi {
           console.log('Request failed', error);
         });
       } else {
-        fetch('http://localhost:3000/api/costs', {
+        fetch('/api/costs', {
           method: 'post',
           headers: {
             'Accept': 'application/json, text/plain, */*',
@@ -54,7 +54,7 @@ class CostApi {
     return new Promise((resolve) => {
       if (confirm("Are you sure you want to delete this cost forever?")) {
         if (costId) {
-          fetch('http://localhost:3000/api/costs/' + costId, {
+          fetch('/api/costs/' + costId, {
             method: 'delete',
             headers: {
               'Accept': 'application/json, text/plain, */*',

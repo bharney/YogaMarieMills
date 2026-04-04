@@ -1,4 +1,5 @@
-﻿import React, { PropTypes } from 'react';
+﻿import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -13,7 +14,14 @@ class BlogPage extends React.Component {
     render() {
         const { blog } = this.props;
 
-        let blogImg = blog.image ? require(`../../images/${blog.image}`) : ""
+        let blogImg = "";
+        if (blog.image) {
+            try {
+                blogImg = require(`../../images/${blog.image}`);
+            } catch (error) {
+                blogImg = `/images/${encodeURIComponent(blog.image)}`;
+            }
+        }
 
         const blogImage = {
             backgroundImage: 'url(' + blogImg + ')',
@@ -27,7 +35,7 @@ class BlogPage extends React.Component {
                 <div className="ribbon bg-image-landing b-border">
                     <div className="container p-t-4-em">
                         <div className="row m-b-1-em">
-                            <div className="col-xs-12">
+                            <div className="col-12">
                                 <h1 className="color-white text-center">{blog.title}</h1>
                                 <div className="mdl-card mdl-shadow--4dp">
                                     <div className="mdl-card__media v-h-40 image-text-container" style={blogImage}>
@@ -37,8 +45,8 @@ class BlogPage extends React.Component {
                                             </header>
                                         </div>
                                     </div>
-                                    <div className="col-xs-12 t-border-thin p-20">
-                                        <div className="mdl-color-text--grey-700 col-xs-12 m-b-15">
+                                    <div className="col-12 t-border-thin p-20">
+                                        <div className="mdl-color-text--grey-700 col-12 m-b-15">
                                             <div className="pull-left">
                                                 <p><strong>{blog.postDate} by <Link to="/about">Marie Mills</Link></strong></p>
                                             </div>

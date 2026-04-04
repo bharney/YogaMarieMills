@@ -1,4 +1,5 @@
-﻿import React, { PropTypes } from 'react';
+﻿import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as classTypesActions from '../../actions/classTypesActions';
@@ -11,13 +12,26 @@ class ClassTypePage extends React.Component {
         super(props, context);
     }
 
+    componentDidMount() {
+        if (!this.props.classType || !this.props.classType.id) {
+            this.props.actions.loadClassTypes();
+        }
+    }
+
     render() {
         const { classType } = this.props;
 
-        let classTypeImg = classType.image != "" ? require(`../../images/${classType.image}`) : ""
+        let classTypeImg = "";
+        if (classType.image) {
+            try {
+                classTypeImg = require(`../../images/${classType.image}`);
+            } catch (error) {
+                classTypeImg = `/images/${encodeURIComponent(classType.image)}`;
+            }
+        }
 
         const classTypeImage = {
-            backgroundImage: 'url(' + classTypeImg + ')',
+            backgroundImage: classTypeImg ? `url("${classTypeImg}")` : 'none',
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
             backgroundSize: "cover"
@@ -28,10 +42,10 @@ class ClassTypePage extends React.Component {
                 <div className="ribbon bg-image-landing b-border">
                     <div className="container">
                         <div className="row m-b-1-em">
-                            <div key={classType.id} className="col-xs-12">
+                            <div key={classType.id} className="col-12">
                                 <h1 className="color-white text-center">{classType.title}</h1>
                                 <hr />
-                                <div className="col-xs-12 m-b-1-em">
+                                <div className="col-12 m-b-1-em">
                                     <div className="mdl-card mdl-shadow--4dp">
                                         <div className="mdl-card__media v-h-40 image-text-container" style={classTypeImage}>
                                             <div className="text-left align-bottom m-l-20 m-b-20">
@@ -40,20 +54,20 @@ class ClassTypePage extends React.Component {
                                                 </header>
                                             </div>
                                         </div>
-                                        <div className="col-xs-12 t-border-thin p-20">
+                                        <div className="col-12 t-border-thin p-20">
                                             <div id="editor" className="editor">
-                                                    <p>
-                                                        <Editor
-                                                            editorState={EditorState.createWithContent(
-                                                                classType.description ? convertFromRaw(JSON.parse(classType.description))
-                                                                    : convertFromRaw({ blocks: [{ text: '', type: 'unstyled', },], entityMap: { first: { type: 'TOKEN', mutability: 'MUTABLE', }, } }),
-                                                                this.decorator,
-                                                            )}
-                                                            readOnly={true}
-                                                            ref="editor"
-                                                        />
-                                                    </p>
+                                                <div>
+                                                    <Editor
+                                                        editorState={EditorState.createWithContent(
+                                                            classType.description ? convertFromRaw(JSON.parse(classType.description))
+                                                                : convertFromRaw({ blocks: [{ text: '', type: 'unstyled', },], entityMap: { first: { type: 'TOKEN', mutability: 'MUTABLE', }, } }),
+                                                            this.decorator,
+                                                        )}
+                                                        readOnly={true}
+                                                        ref="editor"
+                                                    />
                                                 </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

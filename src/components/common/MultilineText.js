@@ -1,13 +1,16 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const MultilineText = ({multilineText}) => {
-
+const MultilineText = ({ multilineText }) => {
   return (
-    <div>
-      {multilineText.split("\\n").map(lineText => {
-        return <p className="dark-color">{lineText}&nbsp;</p>;
-      })}
-    </div>
+    <React.Fragment>
+      {multilineText.split("\\n").map((lineText, index) => (
+        <React.Fragment key={`multiline-${index}`}>
+          <span className="dark-color">{lineText}&nbsp;</span>
+          {index < multilineText.split("\\n").length - 1 ? <br /> : null}
+        </React.Fragment>
+      ))}
+    </React.Fragment>
   );
 };
 

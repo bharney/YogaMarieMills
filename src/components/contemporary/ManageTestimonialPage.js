@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as testimonialActions from '../../actions/testimonialActions';
@@ -98,8 +99,11 @@ class ManageTestimonialPage extends React.Component {
     }
     testimonial.description = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()));
     this.setState({ testimonial });
-    this.props.actions.saveTestimonial(this.state.testimonial);
-    this.context.router.push('/Ayurveda/Testimonials');
+    this.props.actions.saveTestimonial(this.state.testimonial)
+      .then(() => this.props.actions.loadTestimonial())
+      .then(() => {
+        this.context.router.push('/Ayurveda/Testimonials');
+      });
   }
 
   addRow(e) {
@@ -122,11 +126,11 @@ class ManageTestimonialPage extends React.Component {
   }
 
   render() {
-    const {authorized} = this.props;
+    const { authorized } = this.props;
     return (
       <TestimonialForm
         authorized={authorized}
-        saveTestimonial={this.saveTestimonial} 
+        saveTestimonial={this.saveTestimonial}
         updateTestimonialState={this.updateTestimonialState}
         updateQuoteState={this.updateQuoteState}
         updateNameState={this.updateNameState}
@@ -138,7 +142,7 @@ class ManageTestimonialPage extends React.Component {
         onChange={this.onChange}
         editorState={this.state.editorState}
         ref="editor"
-        focus={focus}
+        focus={this.focus}
       />
     );
   }

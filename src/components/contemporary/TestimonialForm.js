@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import TextInput from '../common/TextInput';
 import Admin from '../common/Admin';
@@ -41,7 +42,7 @@ const TestimonialForm = ({ authorized, updateQuoteState, updateNameState, update
         <div className="ribbon bg-image-landing">
           <div className="container-fluid">
             <div className="row m-t-1-em m-b-1-em">
-              <div className="col-xs-offset-12 col-sm-offset-1 col-sm-10 m-b-1-em">
+              <div className="col-offset-12 col-sm-offset-1 col-sm-10 m-b-1-em">
                 <Admin saveAction={saveTestimonial} authorized={authorized} />
                 <h1 className="color-white text-center">{testimonial.header}</h1>
                 <TextInput
@@ -49,7 +50,7 @@ const TestimonialForm = ({ authorized, updateQuoteState, updateNameState, update
                   label="Title"
                   value={testimonial.short}
                   onChange={updateTestimonialState} />
-                <div className="col-xs-12 m-b-1-em">
+                <div className="col-12 m-b-1-em">
                   <div className="mdl-card mdl-shadow--4dp p-1-em">
                     <div id="editor" className="editor" onClick={focus}>
                       <p>
@@ -87,11 +88,11 @@ const TestimonialForm = ({ authorized, updateQuoteState, updateNameState, update
 };
 
 TestimonialForm.propTypes = {
-  testimonial: React.PropTypes.object.isRequired,
-  updateTestimonialState: React.PropTypes.object.isRequired,
-  saving: React.PropTypes.object.isRequired,
-  saveTestimonial: React.PropTypes.func.isRequired,
-  errors: React.PropTypes.object
+  testimonial: PropTypes.object.isRequired,
+  updateTestimonialState: PropTypes.object.isRequired,
+  saving: PropTypes.object.isRequired,
+  saveTestimonial: PropTypes.func.isRequired,
+  errors: PropTypes.object
 };
 
 export default TestimonialForm;

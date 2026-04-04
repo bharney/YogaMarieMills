@@ -1,4 +1,5 @@
-﻿import React, { PropTypes } from 'react';
+﻿import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Admin from '../common/Admin';
@@ -7,6 +8,12 @@ import * as massageActions from '../../actions/massageActions';
 class MassagePage extends React.Component {
     constructor(props, context) {
         super(props, context);
+    }
+
+    componentDidMount() {
+        if (!this.props.massageTypes || this.props.massageTypes.length === 0) {
+            this.props.actions.loadMassage();
+        }
     }
 
     render() {
@@ -26,7 +33,7 @@ class MassagePage extends React.Component {
             if (massage_details.title)
                 if (massage.massage_details.findIndex(i => i.id == massage_details.id) % 2 == 0) {
                     return (
-                        <div className="col-xs-12 col-sm-offset-2 col-sm-4 massage-details">
+                        <div className="col-12 col-sm-offset-2 col-sm-4 massage-details">
                             <h4><strong>{massage_details.title}</strong></h4>
                             <p>{massage_details.description}</p>
                         </div>
@@ -34,7 +41,7 @@ class MassagePage extends React.Component {
                 }
                 else {
                     return (
-                        <div className="col-xs-12 col-sm-offset-1 col-sm-4 massage-details">
+                        <div className="col-12 col-sm-offset-1 col-sm-4 massage-details">
                             <h4><strong>{massage_details.title}</strong></h4>
                             <p>{massage_details.description}</p>
                         </div>
@@ -47,14 +54,14 @@ class MassagePage extends React.Component {
                 <div className="ribbon bg-image-landing">
                     <div className="container p-t-4-em">
                         <div className="row">
-                            <div className="col-xs-12">
+                            <div className="col-12">
                                 <h1 className="text-center color-white m-0">{massageType.header}</h1>
                                 <h3 className="text-center color-white m-0 m-b-2-em">{massageType.description}
                                     <br />Venue: {massageType.venue}</h3>
                                 <Admin addAction={"Massage/" + massageType.type} authorized={authorized} />
                             </div>
                             {massageType.massages.map(massage =>
-                                <div className="col-xs-12 m-t-1-em m-b-3-em">
+                                <div className="col-12 m-t-1-em m-b-3-em">
                                     <div>
                                         <Admin editAction={"Massage/" + massageType.type + "/" + massage.id} authorized={authorized} />
                                     </div>
@@ -65,7 +72,7 @@ class MassagePage extends React.Component {
                                         <h4 className="m-0 text-center"><strong>{massage.session_time}</strong></h4>
                                         <h4 className="m-0 text-center"><strong>{massage.cost}</strong></h4>
                                         <div className="row">
-                                            <div className="col-xs-12">
+                                            <div className="col-12">
                                                 {massage.massage_details.map(massage_details =>
                                                     offsetColumns(massage, massage_details)
                                                 )}
@@ -85,7 +92,7 @@ class MassagePage extends React.Component {
 
 MassagePage.propTypes = {
     massageTypes: PropTypes.array.isRequired,
-    massageType: PropTypes.array.isRequired,
+    massageType: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
 }
 
@@ -100,12 +107,14 @@ function getMassageByType(massageTypes, type) {
 
 function mapStateToProps(state, ownProps) {
     const massageTypeId = ownProps.params.id;
-    let massageType = { type: '', header: '', description: '', venue: '', massages: [{ session_time: '', title: '', details: '', cost: '', massage_details: [{ title: '', description: '' }] }] };
+    const defaultMassageType = { type: '', header: '', description: '', venue: '', massages: [] };
+    let massageType = defaultMassageType;
     if (massageTypeId && state.massageTypes.length > 0) {
-        massageType = getMassageByType(state.massageTypes, massageTypeId);
+        massageType = getMassageByType(state.massageTypes, massageTypeId) || defaultMassageType;
     }
 
     return {
+        massageTypes: state.massageTypes,
         massageType: massageType,
         authorized: state.authToken
     };

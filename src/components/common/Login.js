@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -21,10 +22,10 @@ class Login extends React.Component {
         const { login } = this.props;
         let that = this;
         function LoginOut(login) {
-            if (!login.authToken) 
+            if (!login.authToken)
                 return <Link to={`/Login`}>Login</Link>
 
-                return <Link to="" className="hover" onClick={that.Logout}>Logout</Link>
+            return <Link to="" className="hover" onClick={that.Logout}>Logout</Link>
         }
         return (
             <span>{LoginOut(login)}</span>
