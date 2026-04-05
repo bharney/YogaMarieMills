@@ -1,0 +1,20 @@
+version: '3.8'
+
+# Production compose file for local testing of production image
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+
+services:
+  app:
+    image: yoga-marie-mills:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_SERVER=${DB_SERVER}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT:-1433}
+    volumes:
+      - ./uploaded-images:/app/uploaded-images
+    restart: always
