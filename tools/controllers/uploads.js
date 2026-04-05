@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import multer from 'multer'
-import secret from '../../secrets';
+import { secret } from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
 
