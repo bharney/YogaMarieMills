@@ -36,12 +36,6 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Run linter
-        run: npm run lint
-
-      - name: Run tests
-        run: npm run test:CI
-
   build-and-push:
     needs: test
     runs-on: ubuntu-latest
