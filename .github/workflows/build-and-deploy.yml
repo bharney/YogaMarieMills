@@ -17,27 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libpng-dev
-
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps
-
   build-and-push:
-    needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     outputs:
