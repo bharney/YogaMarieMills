@@ -39,15 +39,15 @@ let loginRoutes = function () {
                 }
             ).then(function (recordset) {
                     if (!recordset || recordset.length === 0 || !recordset[0].emailAddress) {
-                        return res.send(401, { message: "Email Address is incorrect." });
+                        return res.status(401).send({ message: "Email Address is incorrect." });
                     }
 
                     console.log("password: " + user.password)
                     bcrypt.compare(user.password, recordset[0].password, function (err, isMatch) {
-                        if (err) return;
+                        if (err) return res.status(500).send({ message: "Unable to process login." });
 
                         if (!isMatch) {
-                            res.send(401, { message: "Password is incorrect." })
+                            res.status(401).send({ message: "Password is incorrect." })
                         } else {
                             createToken(recordset[0], res, req)
                         }

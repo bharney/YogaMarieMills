@@ -28,7 +28,8 @@
     "open:cover": "npm run test:cover && open coverage/lcov-report/index.html",
     "analyze-bundle": "babel-node ./tools/analyzeBundle.js",
     "db:init": "babel-node tools/dbInit.js",
-    "db:reset-seed-all": "babel-node tools/dbResetSeedAll.js"
+    "db:reset-seed-all": "babel-node tools/dbResetSeedAll.js",
+    "db:seed-user": "babel-node tools/dbSeedUser.js"
   },
   "author": "Brian Harney",
   "license": "MIT",
