@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import sql from 'mssql';
 import bcrypt from 'bcrypt-nodejs';
 import { getDbConfig } from '../secrets';
+import { bootstrapKeyVaultSecrets } from './keyVaultBootstrap';
 
 dotenv.config();
 
@@ -20,6 +21,9 @@ function esc(value) {
 }
 
 async function seedUser() {
+    // Bootstrap Key Vault first so we seed the same DB the server uses
+    await bootstrapKeyVaultSecrets();
+
     const email = process.env.SEED_ADMIN_EMAIL;
     const password = process.env.SEED_ADMIN_PASSWORD;
     const firstName = process.env.SEED_ADMIN_FIRST_NAME || 'Admin';

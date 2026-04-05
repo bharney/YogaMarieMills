@@ -11,9 +11,14 @@ function getConnection() {
             return Promise.reject(new Error('DATABASE_URL is not set.'));
         }
 
-        connectionPromise = sql.connect(connectionConfig).catch(function (error) {
-            connectionPromise = null;
-            throw error;
+        connectionPromise = new Promise(function (resolve, reject) {
+            const conn = new sql.Connection(connectionConfig, function (err) {
+                if (err) {
+                    connectionPromise = null;
+                    return reject(err);
+                }
+                resolve(conn);
+            });
         });
     }
 
@@ -21,9 +26,9 @@ function getConnection() {
 }
 
 export function executeQuery(queryText, configureRequest) {
-    return getConnection().then(function () {
+    return getConnection().then(function (conn) {
         return new Promise(function (resolve, reject) {
-            const request = new sql.Request();
+            const request = new sql.Request(conn);
 
             if (configureRequest) {
                 configureRequest(request, sql);
