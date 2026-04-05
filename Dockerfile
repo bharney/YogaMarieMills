@@ -7,6 +7,15 @@ WORKDIR /app
 COPY package*.json ./
 COPY tools/nodeVersionCheck.js ./tools/nodeVersionCheck.js
 
+# Install OS build dependencies required by native modules (e.g. pngquant-bin).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpng-dev \
+    build-essential \
+    autoconf \
+    automake \
+    libtool \
+  && rm -rf /var/lib/apt/lists/*
+
 # Install all deps for build/transpile tooling.
 RUN npm ci --legacy-peer-deps
 
