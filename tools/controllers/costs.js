@@ -1,8 +1,8 @@
 import express from 'express';
-import sql from 'mssql';
-import {secret, dbconfig} from '../../secrets';
+import {secret} from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
+import { executeQuery } from '../sqlQuery';
 
 let costRoutes = function () {
 
@@ -34,21 +34,23 @@ let costRoutes = function () {
                 return res.status(401).send({ message: "You are not authorized" })
             }
             let cost = (req.body);
-            const sqlInsertCost = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlInsertCost);
-                request.input('type', sql.VarChar, cost.type);
-                request.input('course', sql.VarChar, cost.course);
-                request.input('cost', sql.VarChar, tryParseCurrency(cost.cost));
-                request.input('duration', sql.VarChar, cost.duration);
-                request.input('description', sql.VarChar, cost.description);
-                request.input('package', sql.VarChar, cost.package);
-                request.input('sequence', sql.Int, cost.sequence);
-                request.query(
-                    `INSERT INTO Costs (type, course, cost, duration, description, package, sequence)
-                     VALUES (@type, @course, @cost, @duration, @description, @package, @sequence)`
-                ).then(res.status(201).send(cost)).catch(function (err) {
-                    console.log("insert Costs: " + err);
-                });
+            executeQuery(
+                `INSERT INTO Costs (type, course, cost, duration, description, package, sequence)
+                 VALUES (@type, @course, @cost, @duration, @description, @package, @sequence)`,
+                function (request, sql) {
+                    request.input('type', sql.VarChar, cost.type);
+                    request.input('course', sql.VarChar, cost.course);
+                    request.input('cost', sql.VarChar, tryParseCurrency(cost.cost));
+                    request.input('duration', sql.VarChar, cost.duration);
+                    request.input('description', sql.VarChar, cost.description);
+                    request.input('package', sql.VarChar, cost.package);
+                    request.input('sequence', sql.Int, cost.sequence);
+                }
+            ).then(function () {
+                res.status(201).send(cost);
+            }).catch(function (err) {
+                console.log("insert Costs: " + err);
+                res.status(500).send("Unable to save cost.");
             });
         })
         .put(function (req, res) {
@@ -64,29 +66,31 @@ let costRoutes = function () {
                 return res.status(401).send({ message: "You are not authorized" })
             }
             let cost = (req.body);
-            const sqlUpdateCost = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlUpdateCost);
-                request.input('id', sql.Int, cost.id);
-                request.input('type', sql.VarChar, cost.type);
-                request.input('course', sql.VarChar, cost.course);
-                request.input('cost', sql.VarChar, tryParseCurrency(cost.cost));
-                request.input('duration', sql.VarChar, cost.duration);
-                request.input('description', sql.VarChar, cost.description);
-                request.input('package', sql.VarChar, cost.package);
-                request.input('sequence', sql.Int, cost.sequence);
-                request.query(
-                    `UPDATE Costs
-                    SET type = @type
-                    ,course = @course
-                    ,cost = @cost
-                    ,duration = @duration
-                    ,description = @description
-                    ,package = @package
-                    ,sequence = @sequence
-                    WHERE id = @id`
-                ).then(res.status(201).send(cost)).catch(function (err) {
-                    console.log("update Costs: " + err);
-                });
+            executeQuery(
+                `UPDATE Costs
+                SET type = @type
+                ,course = @course
+                ,cost = @cost
+                ,duration = @duration
+                ,description = @description
+                ,package = @package
+                ,sequence = @sequence
+                WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, cost.id);
+                    request.input('type', sql.VarChar, cost.type);
+                    request.input('course', sql.VarChar, cost.course);
+                    request.input('cost', sql.VarChar, tryParseCurrency(cost.cost));
+                    request.input('duration', sql.VarChar, cost.duration);
+                    request.input('description', sql.VarChar, cost.description);
+                    request.input('package', sql.VarChar, cost.package);
+                    request.input('sequence', sql.Int, cost.sequence);
+                }
+            ).then(function () {
+                res.status(201).send(cost);
+            }).catch(function (err) {
+                console.log("update Costs: " + err);
+                res.status(500).send("Unable to update cost.");
             });
         })
         .delete(function (req, res) {
@@ -101,58 +105,60 @@ let costRoutes = function () {
             if (moment().unix() > payload.exp) {
                 return res.status(401).send({ message: "You are not authorized" })
             }
-            const sqlDeleteCost = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlDeleteCost);
-                request.input('id', sql.Int, req.body.id);
-                request.query(
-                    `DELETE FROM Costs
-                     WHERE id = @id`
-                ).then(res.status(201).send("Cost has been deleted.")).catch(function (err) {
-                    console.log("delete cost: " + err);
-                });
+            executeQuery(
+                `DELETE FROM Costs
+                 WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.body.id);
+                }
+            ).then(function () {
+                res.status(201).send("Cost has been deleted.");
+            }).catch(function (err) {
+                console.log("delete cost: " + err);
+                res.status(500).send("Unable to delete cost.");
             });
         })
         .get(function (req, res) {
-            const sqlCosts = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlCosts);
-                request.query(`SELECT id
+            executeQuery(
+                `SELECT id
                                 ,type
                                 ,course
-                                ,CASE WHEN ISNUMERIC(cost) = 1 
-                                 THEN FORMAT(TRY_PARSE(cost AS money), 'C', 'de-de') 
+                                ,CASE WHEN ISNUMERIC(cost) = 1
+                                 THEN FORMAT(TRY_PARSE(cost AS money), 'C', 'de-de')
                                  ELSE cost END AS cost
                                 ,duration
                                 ,description
-                                ,package 
+                                ,package
                                 ,sequence
                                 FROM Costs
                                 ORDER BY sequence`
-                ).then(function (recordset) {
-                    res.json(recordset);
-                }).catch(function (err) {
-                    console.log("costs: " + err);
-                });
+            ).then(function (recordset) {
+                res.json(recordset);
+            }).catch(function (err) {
+                console.log("costs: " + err);
+                res.status(500).send("Unable to load costs.");
             });
         });
 
     costRouter.route('/costs/:costId')
         .get(function (req, res) {
-            const sqlCost = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlCost);
-                request.input('id', sql.Int, req.params.costId);
-                request.query(`SELECT id
+            executeQuery(
+                `SELECT id
                                 ,type
                                 ,course
-                                ,CASE WHEN ISNUMERIC(cost) = 1 
-                                 THEN FORMAT(TRY_PARSE(cost AS money), 'C', 'de-de') 
-                                 ELSE cost END AS cost 
+                                ,CASE WHEN ISNUMERIC(cost) = 1
+                                 THEN FORMAT(TRY_PARSE(cost AS money), 'C', 'de-de')
+                                 ELSE cost END AS cost
                                 ,duration
                                 ,description
-                                ,package 
+                                ,package
                                 ,sequence
                                 FROM Costs
-                                WHERE id = @id`
-                ).then(function (recordset) {
+                                WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.params.costId);
+                }
+            ).then(function (recordset) {
                     if (recordset.length > 0) {
                         res.json(recordset);
                     }
@@ -161,8 +167,8 @@ let costRoutes = function () {
                     }
                 }).catch(function (err) {
                     console.log("Cost: " + err);
+                    res.status(500).send("Unable to load cost.");
                 });
-            });
         })
         .delete(function (req, res) {
             if (!req.headers.authorization) {
@@ -176,15 +182,17 @@ let costRoutes = function () {
             if (moment().unix() > payload.exp) {
                 return res.status(401).send({ message: "You are not authorized" })
             }
-            const sqlDeleteCost = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlDeleteCost);
-                request.input('id', sql.Int, req.params.costId);
-                request.query(
-                    `DELETE FROM Costs
-                     WHERE id = @id`
-                ).then(res.status(201).send("Cost has been deleted.")).catch(function (err) {
-                    console.log("delete Costs: " + err);
-                });
+            executeQuery(
+                `DELETE FROM Costs
+                 WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.params.costId);
+                }
+            ).then(function () {
+                res.status(201).send("Cost has been deleted.");
+            }).catch(function (err) {
+                console.log("delete Costs: " + err);
+                res.status(500).send("Unable to delete cost.");
             });
         });
 

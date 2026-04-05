@@ -1,8 +1,8 @@
 import express from 'express';
-import sql from 'mssql';
-import {secret, dbconfig} from '../../secrets';
+import {secret} from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
+import { executeQuery } from '../sqlQuery';
 
 let classTypeRoutes = function () {
 
@@ -22,23 +22,25 @@ let classTypeRoutes = function () {
                 return res.status(401).send({ message: "You are not authorized" })
             }
             let classType = (req.body);
-            const sqlInsertClassType = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlInsertClassType);
-                request.input('title', sql.VarChar, classType.title);
-                request.input('short', sql.VarChar, classType.short);
-                request.input('description', sql.VarChar, classType.description);
-                request.input('image', sql.VarChar, classType.image);
-                request.input('href', sql.VarChar, classType.href);
-                request.input('type', sql.VarChar, classType.type);
-                request.input('component', sql.VarChar, classType.component);
-                request.input('detail', sql.VarChar, classType.detail);
-                request.input('route', sql.VarChar, classType.route);
-                request.query(
-                    `INSERT INTO ClassTypes (type, title, short, description, image, href, component, detail, route)
-                     VALUES (@type, @title, @short, @description, @image, @href, @component, @detail, @route)`
-                ).then(res.status(201).send(classType)).catch(function (err) {
-                    console.log("insert ClassTypes: " + err);
-                });
+            executeQuery(
+                `INSERT INTO ClassTypes (type, title, short, description, image, href, component, detail, route)
+                 VALUES (@type, @title, @short, @description, @image, @href, @component, @detail, @route)`,
+                function (request, sql) {
+                    request.input('title', sql.VarChar, classType.title);
+                    request.input('short', sql.VarChar, classType.short);
+                    request.input('description', sql.VarChar, classType.description);
+                    request.input('image', sql.VarChar, classType.image);
+                    request.input('href', sql.VarChar, classType.href);
+                    request.input('type', sql.VarChar, classType.type);
+                    request.input('component', sql.VarChar, classType.component);
+                    request.input('detail', sql.VarChar, classType.detail);
+                    request.input('route', sql.VarChar, classType.route);
+                }
+            ).then(function () {
+                res.status(201).send(classType);
+            }).catch(function (err) {
+                console.log("insert ClassTypes: " + err);
+                res.status(500).send("Unable to save class type.");
             });
         })
         .put(function (req, res) {
@@ -54,33 +56,35 @@ let classTypeRoutes = function () {
                 return res.status(401).send({ message: "You are not authorized" })
             }
             let classType = (req.body);
-            const sqlUpdateClassType = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlUpdateClassType);
-                request.input('id', sql.Int, classType.id);
-                request.input('title', sql.VarChar, classType.title);
-                request.input('short', sql.VarChar, classType.short);
-                request.input('description', sql.VarChar, classType.description);
-                request.input('image', sql.VarChar, classType.image);
-                request.input('href', sql.VarChar, classType.href);
-                request.input('type', sql.VarChar, classType.type);
-                request.input('component', sql.VarChar, classType.component);
-                request.input('detail', sql.VarChar, classType.detail);
-                request.input('route', sql.VarChar, classType.route);
-                request.query(
-                    `UPDATE ClassTypes
-                    SET title = @title
-                    ,short = @short
-                    ,description = @description
-                    ,image = @image
-                    ,href = @href
-                    ,type = @type
-                    ,component = @component
-                    ,detail = @detail
-                    ,route = @route
-                    WHERE id = @id`
-                ).then(res.status(201).send(classType)).catch(function (err) {
-                    console.log("update ClassTypes: " + err);
-                });
+            executeQuery(
+                `UPDATE ClassTypes
+                SET title = @title
+                ,short = @short
+                ,description = @description
+                ,image = @image
+                ,href = @href
+                ,type = @type
+                ,component = @component
+                ,detail = @detail
+                ,route = @route
+                WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, classType.id);
+                    request.input('title', sql.VarChar, classType.title);
+                    request.input('short', sql.VarChar, classType.short);
+                    request.input('description', sql.VarChar, classType.description);
+                    request.input('image', sql.VarChar, classType.image);
+                    request.input('href', sql.VarChar, classType.href);
+                    request.input('type', sql.VarChar, classType.type);
+                    request.input('component', sql.VarChar, classType.component);
+                    request.input('detail', sql.VarChar, classType.detail);
+                    request.input('route', sql.VarChar, classType.route);
+                }
+            ).then(function () {
+                res.status(201).send(classType);
+            }).catch(function (err) {
+                console.log("update ClassTypes: " + err);
+                res.status(500).send("Unable to update class type.");
             });
         })
         .delete(function (req, res) {
@@ -95,21 +99,21 @@ let classTypeRoutes = function () {
             if (moment().unix() > payload.exp) {
                 return res.status(401).send({ message: "You are not authorized" })
             }
-            const sqlDeleteClassType = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlDeleteClassType);
-                request.input('id', sql.Int, req.body.id);
-                request.query(
-                    `DELETE FROM ClassTypes
-                     WHERE id = @id`
-                ).then(res.status(201).send("ClassType has been deleted.")).catch(function (err) {
-                    console.log("delete classType: " + err);
-                });
+            executeQuery(
+                `DELETE FROM ClassTypes
+                 WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.body.id);
+                }
+            ).then(function () {
+                res.status(201).send("ClassType has been deleted.");
+            }).catch(function (err) {
+                console.log("delete classType: " + err);
+                res.status(500).send("Unable to delete class type.");
             });
         })
         .get(function (req, res) {
-            const sqlClassTypes = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlClassTypes);
-                request.query(`SELECT id
+            executeQuery(`SELECT id
                                 ,type
                                 ,title
                                 ,image
@@ -120,19 +124,16 @@ let classTypeRoutes = function () {
                                 ,detail
                                 ,route
                                 FROM ClassTypes`).then(function (recordset) {
-                        res.json(recordset);
-                    }).catch(function (err) {
-                        console.log("get classTypes: " + err);
-                    });
-            });
+                    res.json(recordset);
+                }).catch(function (err) {
+                    console.log("get classTypes: " + err);
+                    res.status(500).send("Unable to load class types.");
+                });
         });
 
     classTypeRouter.route('/classTypes/:classTypeId')
         .get(function (req, res) {
-            const sqlClassType = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlClassType);
-                request.input('id', sql.Int, req.params.classTypeId);
-                request.query(`SELECT id
+            executeQuery(`SELECT id
                                 ,title
                                 ,short
                                 ,description
@@ -141,8 +142,11 @@ let classTypeRoutes = function () {
                                 ,type
                                 ,component
                                 FROM classTypes
-                                WHERE id = @id`
-                ).then(function (recordset) {
+                                WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.params.classTypeId);
+                }
+            ).then(function (recordset) {
                     if (recordset.length > 0) {
                         res.json(recordset);
                     }
@@ -151,8 +155,8 @@ let classTypeRoutes = function () {
                     }
                 }).catch(function (err) {
                     console.log("ClassType: " + err);
+                    res.status(500).send("Unable to load class type.");
                 });
-            });
         })
         .delete(function (req, res) {
             if (!req.headers.authorization) {
@@ -166,15 +170,17 @@ let classTypeRoutes = function () {
             if (moment().unix() > payload.exp) {
                 return res.status(401).send({ message: "You are not authorized" })
             }
-            const sqlDeleteClassType = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlDeleteClassType);
-                request.input('id', sql.Int, req.params.classTypeId);
-                request.query(
-                    `DELETE FROM ClassTypes
-                     WHERE id = @id`
-                ).then(res.status(201).send("ClassType has been deleted.")).catch(function (err) {
-                    console.log("delete ClassTypes: " + err);
-                });
+            executeQuery(
+                `DELETE FROM ClassTypes
+                 WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.params.classTypeId);
+                }
+            ).then(function () {
+                res.status(201).send("ClassType has been deleted.");
+            }).catch(function (err) {
+                console.log("delete ClassTypes: " + err);
+                res.status(500).send("Unable to delete class type.");
             });
         });
 

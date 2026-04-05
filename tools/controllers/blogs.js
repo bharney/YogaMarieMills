@@ -1,8 +1,8 @@
 import express from 'express';
-import sql from 'mssql';
-import {secret, dbconfig} from '../../secrets';
+import {secret} from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
+import { executeQuery } from '../sqlQuery';
 
 let blogRoutes = function () {
 
@@ -22,26 +22,26 @@ let blogRoutes = function () {
                 return res.status(401).send({ message: "You are not authorized" })
             }
             let blog = (req.body);
-            const sqlInsertBlog = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlInsertBlog);
-                request.input('title', sql.VarChar, blog.title);
-                request.input('short', sql.VarChar, blog.short);
-                request.input('description', sql.VarChar, blog.description);
-                request.input('image', sql.VarChar, blog.image);
-                request.query(
-                    `INSERT INTO Blogs (title, short, description, image, href, type, component)
-                     VALUES (@title, @short, @description, @image, '', 'blog', 'BlogPage');
-                     SELECT SCOPE_IDENTITY() as id`
-                ).then(function (recordset) {
-                    if (recordset && recordset.length > 0) {
-                        blog.id = recordset[0].id;
-                    }
-                    blog.type = 'blog'
-                    blog.component = 'BlogPage'
-                    res.status(201).send(blog)
-                }).catch(function (err) {
-                    console.log("blogs: " + err);
-                });
+            executeQuery(
+                `INSERT INTO Blogs (title, short, description, image, href, type, component)
+                 VALUES (@title, @short, @description, @image, '', 'blog', 'BlogPage');
+                 SELECT SCOPE_IDENTITY() as id`,
+                function (request, sql) {
+                    request.input('title', sql.VarChar, blog.title);
+                    request.input('short', sql.VarChar, blog.short);
+                    request.input('description', sql.VarChar, blog.description);
+                    request.input('image', sql.VarChar, blog.image);
+                }
+            ).then(function (recordset) {
+                if (recordset && recordset.length > 0) {
+                    blog.id = recordset[0].id;
+                }
+                blog.type = 'blog';
+                blog.component = 'BlogPage';
+                res.status(201).send(blog);
+            }).catch(function (err) {
+                console.log("blogs: " + err);
+                res.status(500).send("Unable to save blog.");
             });
         })
         .put(function (req, res) {
@@ -57,30 +57,32 @@ let blogRoutes = function () {
                 return res.status(401).send({ message: "You are not authorized" })
             }
             let blog = (req.body);
-            const sqlUpdateBlog = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlUpdateBlog);
-                request.input('id', sql.Int, blog.id);
-                request.input('title', sql.VarChar, blog.title);
-                request.input('short', sql.VarChar, blog.short);
-                request.input('description', sql.VarChar, blog.description);
-                request.input('image', sql.VarChar, blog.image);
-                request.input('href', sql.VarChar, blog.href);
-                request.input('type', sql.VarChar, blog.type);
-                request.input('component', sql.VarChar, blog.component);
-                request.query(
-                    `UPDATE Blogs
-                    SET title = @title
-                    ,short = @short
-                    ,description = @description
-                    ,image = @image
-                    ,href = @href
-                    ,type = @type
-                    ,component = @component
-                    ,postDate = sysdatetimeoffset()
-                    WHERE id = @id`
-                ).then(res.status(201).send(blog)).catch(function (err) {
-                    console.log("update blog: " + err);
-                });
+            executeQuery(
+                `UPDATE Blogs
+                SET title = @title
+                ,short = @short
+                ,description = @description
+                ,image = @image
+                ,href = @href
+                ,type = @type
+                ,component = @component
+                ,postDate = sysdatetimeoffset()
+                WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, blog.id);
+                    request.input('title', sql.VarChar, blog.title);
+                    request.input('short', sql.VarChar, blog.short);
+                    request.input('description', sql.VarChar, blog.description);
+                    request.input('image', sql.VarChar, blog.image);
+                    request.input('href', sql.VarChar, blog.href);
+                    request.input('type', sql.VarChar, blog.type);
+                    request.input('component', sql.VarChar, blog.component);
+                }
+            ).then(function () {
+                res.status(201).send(blog);
+            }).catch(function (err) {
+                console.log("update blog: " + err);
+                res.status(500).send("Unable to update blog.");
             });
         })
         .delete(function (req, res) {
@@ -95,21 +97,21 @@ let blogRoutes = function () {
             if (moment().unix() > payload.exp) {
                 return res.status(401).send({ message: "You are not authorized" })
             }
-            const sqlDeleteBlog = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlDeleteBlog);
-                request.input('id', sql.Int, req.body.id);
-                request.query(
-                    `DELETE FROM Blogs
-                     WHERE id = @id`
-                ).then(res.status(201).send("Blog has been deleted.")).catch(function (err) {
-                    console.log("delete blog: " + err);
-                });
+            executeQuery(
+                `DELETE FROM Blogs
+                 WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.body.id);
+                }
+            ).then(function () {
+                res.status(201).send("Blog has been deleted.");
+            }).catch(function (err) {
+                console.log("delete blog: " + err);
+                res.status(500).send("Unable to delete blog.");
             });
         })
         .get(function (req, res) {
-            const sqlBlogs = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlBlogs);
-                request.query(`SELECT id
+            executeQuery(`SELECT id
                             ,title
                             ,short
                             ,description
@@ -120,20 +122,17 @@ let blogRoutes = function () {
                             ,CONVERT(VARCHAR, postDate, 107) as postDate
                             FROM Blogs
                             ORDER BY postDate DESC`
-                ).then(function (recordset) {
+            ).then(function (recordset) {
                     res.json(recordset);
                 }).catch(function (err) {
                     console.log("blogs: " + err);
+                    res.status(500).send("Unable to load blogs.");
                 });
-            });
         });
 
     blogRouter.route('/blogs/:blogId')
         .get(function (req, res) {
-            const sqlBlog = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlBlog);
-                request.input('id', sql.Int, req.params.blogId);
-                request.query(`SELECT id
+            executeQuery(`SELECT id
                             ,title
                             ,short
                             ,description
@@ -143,8 +142,11 @@ let blogRoutes = function () {
                             ,component
                             ,CONVERT(VARCHAR, postDate, 107) as postDate
                             FROM Blogs
-                            WHERE id = @id`
-                ).then(function (recordset) {
+                            WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.params.blogId);
+                }
+            ).then(function (recordset) {
                     if (recordset.length > 0) {
                         res.json(recordset);
                     }
@@ -153,8 +155,8 @@ let blogRoutes = function () {
                     }
                 }).catch(function (err) {
                     console.log("blog: " + err);
+                    res.status(500).send("Unable to load blog.");
                 });
-            });
         })
         .delete(function (req, res) {
             if (!req.headers.authorization) {
@@ -168,15 +170,17 @@ let blogRoutes = function () {
             if (moment().unix() > payload.exp) {
                 return res.status(401).send({ message: "You are not authorized" })
             }
-            const sqlDeleteBlog = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlDeleteBlog);
-                request.input('id', sql.Int, req.params.blogId);
-                request.query(
-                    `DELETE FROM Blogs
-                     WHERE id = @id`
-                ).then(res.status(201).send("Blog has been deleted.")).catch(function (err) {
-                    console.log("delete blog: " + err);
-                });
+            executeQuery(
+                `DELETE FROM Blogs
+                 WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.params.blogId);
+                }
+            ).then(function () {
+                res.status(201).send("Blog has been deleted.");
+            }).catch(function (err) {
+                console.log("delete blog: " + err);
+                res.status(500).send("Unable to delete blog.");
             });
         });
 

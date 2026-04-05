@@ -1,9 +1,9 @@
 import express from 'express';
-import sql from 'mssql';
-import { secret, dbconfig } from '../../secrets';
+import { secret } from '../../secrets';
 import jwt from 'jwt-simple';
 import bcrypt from 'bcrypt-nodejs';
 import moment from 'moment';
+import { executeQuery } from '../sqlQuery';
 
 let loginRoutes = function () {
 
@@ -26,17 +26,18 @@ let loginRoutes = function () {
     loginRouter.route('/login')
         .post(function (req, res) {
             let user = (req.body);
-            const sqlAuthorize = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlAuthorize);
-                request.input('emailAddress', sql.VarChar, user.emailAddress);
-                request.query(`SELECT top 1 id
+            executeQuery(
+                `SELECT top 1 id
                                 ,emailAddress
                                 ,password
                                 ,firstName
                                 ,lastName
                                 FROM Users
-                                WHERE emailAddress = @emailAddress`
-                ).then(function (recordset) {
+                                WHERE emailAddress = @emailAddress`,
+                function (request, sql) {
+                    request.input('emailAddress', sql.VarChar, user.emailAddress);
+                }
+            ).then(function (recordset) {
                     if (!recordset || recordset.length === 0 || !recordset[0].emailAddress) {
                         return res.send(401, { message: "Email Address is incorrect." });
                     }
@@ -53,8 +54,8 @@ let loginRoutes = function () {
                     });
                 }).catch(function (err) {
                     console.log("login: " + err);
+                    res.status(500).send("Unable to process login.");
                 });
-            });
         });
 
     return loginRouter;

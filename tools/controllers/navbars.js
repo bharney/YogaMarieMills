@@ -1,8 +1,8 @@
 import express from 'express';
-import sql from 'mssql';
-import {secret, dbconfig} from '../../secrets';
+import {secret} from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
+import { executeQuery } from '../sqlQuery';
 
 let navbarRoutes = function () {
 
@@ -22,19 +22,21 @@ let navbarRoutes = function () {
                 return res.status(401).send({ message: "You are not authorized" })
             }
             let navbar_item = (req.body);
-            const sqlInsertNavbar = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlInsertNavbar);
-                request.input('type', sql.VarChar, navbar_item.type);
-                request.input('name', sql.VarChar, navbar_item.name);
-                request.input('route', sql.VarChar, navbar_item.route);
-                request.input('href', sql.VarChar, navbar_item.href);
-                request.input('parent_id', sql.Int, navbar_item.parent_id);
-                request.query(
-                    `INSERT INTO Navbar_Items (type, name, route, href, parent_id)
-                    VALUES (@type, @name, @route, @href, @parent_id);`
-                ).then(res.status(201).send(navbar_item)).catch(function (err) {
-                    console.log("insert Navbar: " + err);
-                });
+            executeQuery(
+                `INSERT INTO Navbar_Items (type, name, route, href, parent_id)
+                VALUES (@type, @name, @route, @href, @parent_id);`,
+                function (request, sql) {
+                    request.input('type', sql.VarChar, navbar_item.type);
+                    request.input('name', sql.VarChar, navbar_item.name);
+                    request.input('route', sql.VarChar, navbar_item.route);
+                    request.input('href', sql.VarChar, navbar_item.href);
+                    request.input('parent_id', sql.Int, navbar_item.parent_id);
+                }
+            ).then(function () {
+                res.status(201).send(navbar_item);
+            }).catch(function (err) {
+                console.log("insert Navbar: " + err);
+                res.status(500).send("Unable to save navbar item.");
             });
         })
         .put(function (req, res) {
@@ -50,24 +52,26 @@ let navbarRoutes = function () {
                 return res.status(401).send({ message: "You are not authorized" })
             }
             let navbar_item = (req.body);
-            const sqlUpdateNavbar = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlUpdateNavbar);
-                request.input('id', sql.Int, navbar_item.id);
-                request.input('type', sql.VarChar, navbar_item.type);
-                request.input('name', sql.VarChar, navbar_item.name);
-                request.input('route', sql.VarChar, navbar_item.route);
-                request.input('href', sql.VarChar, navbar_item.href);
-                request.input('parent_id', sql.Int, navbar_item.parent_id);
-                request.query(
-                    `UPDATE Navbar_Items 
-                     SET type = @type
-                     , name = @name
-                     , route = @route
-                     , href = @href
-                     WHERE id = @id;`
-                ).then(res.status(201).send(navbar_item)).catch(function (err) {
-                    console.log("update Navbars: " + err);
-                });
+            executeQuery(
+                `UPDATE Navbar_Items
+                 SET type = @type
+                 , name = @name
+                 , route = @route
+                 , href = @href
+                 WHERE id = @id;`,
+                function (request, sql) {
+                    request.input('id', sql.Int, navbar_item.id);
+                    request.input('type', sql.VarChar, navbar_item.type);
+                    request.input('name', sql.VarChar, navbar_item.name);
+                    request.input('route', sql.VarChar, navbar_item.route);
+                    request.input('href', sql.VarChar, navbar_item.href);
+                    request.input('parent_id', sql.Int, navbar_item.parent_id);
+                }
+            ).then(function () {
+                res.status(201).send(navbar_item);
+            }).catch(function (err) {
+                console.log("update Navbars: " + err);
+                res.status(500).send("Unable to update navbar item.");
             });
         })
         .delete(function (req, res) {
@@ -82,29 +86,29 @@ let navbarRoutes = function () {
             if (moment().unix() > payload.exp) {
                 return res.status(401).send({ message: "You are not authorized" })
             }
-            const sqlDeleteNavbar = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlDeleteNavbar);
-                request.input('id', sql.Int, req.body.id);
-                request.query(
-                    `DELETE FROM Navbar_Items
-                     WHERE id = @id`
-                ).then(res.status(201).send("Navbar has been deleted.")).catch(function (err) {
-                    console.log("delete Navbar: " + err);
-                });
+            executeQuery(
+                `DELETE FROM Navbar_Items
+                 WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.body.id);
+                }
+            ).then(function () {
+                res.status(201).send("Navbar has been deleted.");
+            }).catch(function (err) {
+                console.log("delete Navbar: " + err);
+                res.status(500).send("Unable to delete navbar item.");
             });
         })
         .get(function (req, res) {
-            const sqlNavbars = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlNavbars);
-                request.query(
-                    `SELECT id
-                    ,type
-                    ,name
-                    ,href
-                    ,route
-                    ,parent_id
-                    FROM Navbar_Items`
-                ).then(function (recordset) {
+            executeQuery(
+                `SELECT id
+                ,type
+                ,name
+                ,href
+                ,route
+                ,parent_id
+                FROM Navbar_Items`
+            ).then(function (recordset) {
                     let navbar_items = [];
 
                     for (let navbar_prop in recordset) {
@@ -139,27 +143,24 @@ let navbarRoutes = function () {
                     res.json(navbar_items);
                 }).catch(function (err) {
                     console.log("navbars: " + err);
+                    res.status(500).send("Unable to load navigation items.");
                 });
-            });
         });
 
     navbarRouter.route('/navbars/:navbarId')
         .get(function (req, res) {
-            const sqlNavbar = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlNavbar);
-                request.input('id', sql.Int, req.params.navbarId);
-                request.query(`SELECT id
+            executeQuery(`SELECT id
                                 ,type
-                                ,venue
-                                ,header
-                                ,description
-                                ,session_time
-                                ,title
-                                ,details
-                                ,cost
+                                ,name
+                                ,href
+                                ,route
+                                ,parent_id
                                 FROM Navbar_Items
-                                WHERE id = @id`
-                ).then(function (recordset) {
+                                WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.params.navbarId);
+                }
+            ).then(function (recordset) {
                     if (recordset.length > 0) {
                         res.json(recordset);
                     }
@@ -168,8 +169,8 @@ let navbarRoutes = function () {
                     }
                 }).catch(function (err) {
                     console.log("Navbar: " + err);
+                    res.status(500).send("Unable to load navbar item.");
                 });
-            });
         })
         .delete(function (req, res) {
             if (!req.headers.authorization) {
@@ -183,15 +184,17 @@ let navbarRoutes = function () {
             if (moment().unix() > payload.exp) {
                 return res.status(401).send({ message: "You are not authorized" })
             }
-            const sqlDeleteNavbar = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlDeleteNavbar);
-                request.input('id', sql.Int, req.params.navbarId);
-                request.query(
-                    `DELETE FROM Navbar_Items
-                     WHERE id = @id`
-                ).then(res.status(201).send("Navbar has been deleted.")).catch(function (err) {
-                    console.log("delete Navbar: " + err);
-                });
+            executeQuery(
+                `DELETE FROM Navbar_Items
+                 WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.params.navbarId);
+                }
+            ).then(function () {
+                res.status(201).send("Navbar has been deleted.");
+            }).catch(function (err) {
+                console.log("delete Navbar: " + err);
+                res.status(500).send("Unable to delete navbar item.");
             });
         });
 

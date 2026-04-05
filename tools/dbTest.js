@@ -2,7 +2,12 @@ import sql from 'mssql';
 import { dbconfig } from '../secrets';
 
 console.log('Testing database connection...');
-console.log('Database URL:', dbconfig.substring(0, 50) + '...');
+console.log('Database config:', JSON.stringify({
+    server: dbconfig && dbconfig.server,
+    port: dbconfig && dbconfig.port,
+    database: dbconfig && dbconfig.database,
+    user: dbconfig && dbconfig.user
+}));
 
 const conn = new sql.Connection(dbconfig, function (err) {
     if (err) {

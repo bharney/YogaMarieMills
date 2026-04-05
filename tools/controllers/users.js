@@ -1,9 +1,9 @@
 import express from 'express';
-import sql from 'mssql';
 import bcrypt from 'bcrypt-nodejs';
-import { secret, dbconfig } from '../../secrets';
+import { secret } from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
+import { executeQuery } from '../sqlQuery';
 
 let userRoutes = function () {
 
@@ -33,21 +33,21 @@ let userRoutes = function () {
                     console.log("bcrypt error: " + err);
                     return res.status(500).send({ message: "Error creating user" });
                 }
-                const sqlInsertLogin = new sql.Connection(dbconfig, function () {
-                    let request = new sql.Request(sqlInsertLogin);
-                    request.input('emailAddress', sql.VarChar, user.emailAddress);
-                    request.input('firstName', sql.VarChar, user.firstName);
-                    request.input('lastName', sql.VarChar, user.lastName);
-                    request.input('password', sql.VarChar, hash);
-                    request.query(
-                        `INSERT INTO Users (emailAddress, firstName, lastName, password, createdDate)
-                         VALUES (@emailAddress, @firstName, @lastName, @password, GETDATE());`
-                    ).then(function () {
-                        delete user.password;
-                        res.status(201).send(user);
-                    }).catch(function (err) {
-                        console.log("users: " + err);
-                    });
+                executeQuery(
+                    `INSERT INTO Users (emailAddress, firstName, lastName, password, createdDate)
+                     VALUES (@emailAddress, @firstName, @lastName, @password, GETDATE());`,
+                    function (request, sql) {
+                        request.input('emailAddress', sql.VarChar, user.emailAddress);
+                        request.input('firstName', sql.VarChar, user.firstName);
+                        request.input('lastName', sql.VarChar, user.lastName);
+                        request.input('password', sql.VarChar, hash);
+                    }
+                ).then(function () {
+                    delete user.password;
+                    res.status(201).send(user);
+                }).catch(function (err) {
+                    console.log("users: " + err);
+                    res.status(500).send("Unable to create user.");
                 });
             });
         })
@@ -64,27 +64,27 @@ let userRoutes = function () {
                 return res.status(401).send({ message: "You are not authorized" })
             }
             let user = (req.body);
-            const sqlUpdateLogin = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlUpdateLogin);
-                request.input('id', sql.Int, user.id);
-                request.input('emailAddress', sql.VarChar, user.emailAddress);
-                request.input('firstName', sql.VarChar, user.firstName);
-                request.input('lastName', sql.VarChar, user.LastName);
-                request.input('password', sql.VarChar, encryptPassword(user.password));
-                request.query(
-                    `UPDATE Users
-                    SET emailAddress = @emailAddress
-                    ,firstName = @firstName
-                    ,lastName = @lastName
-                    ,password = @password
-                    ,changedDate = GETDATE()
-                    WHERE id = @id`
-                ).then(function () {
-                    delete user.password;
-                    res.status(201).send(user);
-                }).catch(function (err) {
-                    console.log("update user: " + err);
-                });
+            executeQuery(
+                `UPDATE Users
+                SET emailAddress = @emailAddress
+                ,firstName = @firstName
+                ,lastName = @lastName
+                ,password = @password
+                ,changedDate = GETDATE()
+                WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, user.id);
+                    request.input('emailAddress', sql.VarChar, user.emailAddress);
+                    request.input('firstName', sql.VarChar, user.firstName);
+                    request.input('lastName', sql.VarChar, user.LastName);
+                    request.input('password', sql.VarChar, encryptPassword(user.password));
+                }
+            ).then(function () {
+                delete user.password;
+                res.status(201).send(user);
+            }).catch(function (err) {
+                console.log("update user: " + err);
+                res.status(500).send("Unable to update user.");
             });
         })
         .delete(function (req, res) {
@@ -99,32 +99,33 @@ let userRoutes = function () {
             if (moment().unix() > payload.exp) {
                 return res.status(401).send({ message: "You are not authorized" })
             }
-            const sqlDeleteLogin = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlDeleteLogin);
-                request.input('id', sql.Int, req.body.id);
-                request.query(
-                    `DELETE FROM Users
-                     WHERE id = @id`
-                ).then(res.status(201).send("Login has been deleted.")).catch(function (err) {
-                    console.log("delete user: " + err);
-                });
+            executeQuery(
+                `DELETE FROM Users
+                 WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.body.id);
+                }
+            ).then(function () {
+                res.status(201).send("Login has been deleted.");
+            }).catch(function (err) {
+                console.log("delete user: " + err);
+                res.status(500).send("Unable to delete user.");
             });
         })
         .get(function (req, res) {
-            const sqlLogins = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlLogins);
-                request.query(`SELECT id
+            executeQuery(
+                `SELECT id
                             ,emailAddress
                             ,firstName
                             ,lastName
                             ,'**********' AS password
                             FROM Users
                             ORDER BY id`
-                ).then(function (recordset) {
-                    res.json(recordset);
-                }).catch(function (err) {
-                    console.log("Users: " + err);
-                });
+            ).then(function (recordset) {
+                res.json(recordset);
+            }).catch(function (err) {
+                console.log("Users: " + err);
+                res.status(500).send("Unable to load users.");
             });
         });
 

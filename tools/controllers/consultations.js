@@ -1,8 +1,8 @@
 import express from 'express';
-import sql from 'mssql';
-import {secret, dbconfig} from '../../secrets';
+import {secret} from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
+import { executeQuery } from '../sqlQuery';
 
 let consultationRoutes = function () {
 
@@ -34,25 +34,27 @@ let consultationRoutes = function () {
                 return res.status(401).send({ message: "You are not authorized" })
             }
             let consultation = (req.body);
-            for (let prop in consultation.consultationDetails) {
-                if (consultation.consultationDetails.hasOwnProperty(prop)) {
-                    const sqlInsertConsultation = new sql.Connection(dbconfig, function () {
-                        let request = new sql.Request(sqlInsertConsultation);
+            const insertPromises = Object.keys(consultation.consultationDetails || {}).map(function (prop) {
+                const detail = consultation.consultationDetails[prop];
+                return executeQuery(
+                    `INSERT INTO Consultations (type, title, session_time, short, description, cost)
+                     VALUES (@type, @title, @session_time, @consultation, @consultation_desc, @cost);`,
+                    function (request, sql) {
                         request.input('type', sql.VarChar, 'diet');
-                        request.input('title', sql.VarChar, consultation.consultationDetails[prop].title);
-                        request.input('session_time', sql.VarChar, consultation.consultationDetails[prop].session_time);
-                        request.input('consultation', sql.VarChar, consultation.consultationDetails[prop].consultation);
-                        request.input('consultation_desc', sql.VarChar, consultation.consultationDetails[prop].consultation_desc);
-                        request.input('cost', sql.VarChar, tryParseCurrency(consultation.consultationDetails[prop].cost));
-                        request.query(
-                            `INSERT INTO Consultations (type, title, session_time, short, description, cost)
-                             VALUES (@type, @title, @session_time, @consultation, @consultation_desc, @cost);`
-                        ).then(console.log("post insert: " + consultation)).catch(function (err) {
-                            console.log("insert Consultations: " + err);
-                        });
-                    });
-                }
-            }
+                        request.input('title', sql.VarChar, detail.title);
+                        request.input('session_time', sql.VarChar, detail.session_time);
+                        request.input('consultation', sql.VarChar, detail.consultation);
+                        request.input('consultation_desc', sql.VarChar, detail.consultation_desc);
+                        request.input('cost', sql.VarChar, tryParseCurrency(detail.cost));
+                    }
+                );
+            });
+            Promise.all(insertPromises).then(function () {
+                res.status(201).send(consultation);
+            }).catch(function (err) {
+                console.log("insert Consultations: " + err);
+                res.status(500).send("Unable to save consultation.");
+            });
         })
         .put(function (req, res) {
             if (!req.headers.authorization) {
@@ -68,71 +70,69 @@ let consultationRoutes = function () {
             }
             let consultation = (req.body);
             const consultationDetails = consultation.consultationDetails || [];
-            const sqlUpdateConsultation = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlUpdateConsultation);
-                request.input('venue', sql.VarChar, consultation.venue);
-                request.input('short', sql.VarChar, consultation.short);
-                request.input('description', sql.VarChar, consultation.description);
-                request.input('type', sql.VarChar, 'diet');
+            const existingIds = consultationDetails
+                .filter(function (d) { return d.id; })
+                .map(function (d) { return d.id; });
+            const deleteQuery = existingIds.length > 0
+                ? `DELETE FROM Consultations WHERE type = 'diet' AND id NOT IN (${existingIds.join(',')})`
+                : `DELETE FROM Consultations WHERE type = 'diet'`;
 
-                const existingIds = consultationDetails
-                    .filter(consultationDetail => consultationDetail.id)
-                    .map(function (obj) { return obj.id; });
-                const deleteQuery = existingIds.length > 0
-                    ? `DELETE FROM Consultations WHERE type = 'diet' AND id NOT IN (${existingIds.join(',')})`
-                    : `DELETE FROM Consultations WHERE type = 'diet'`;
-
-                request.query(
-                    `UPDATE Headers
-                     SET venue = @venue
-                     , short = @short
-                     , description = @description
-                     FROM Headers
-                     WHERE type = @type;`
-                ).then(function () {
-                    return new sql.Request(sqlUpdateConsultation).query(deleteQuery);
-                }).then(function () {
-                    const saveRequests = consultationDetails.map(function (detail) {
-                        if (detail.id) {
-                            let updateRequest = new sql.Request(sqlUpdateConsultation);
-                            updateRequest.input('id', sql.Int, detail.id);
-                            updateRequest.input('title', sql.VarChar, detail.title);
-                            updateRequest.input('session_time', sql.VarChar, detail.session_time);
-                            updateRequest.input('consultation', sql.VarChar, detail.consultation);
-                            updateRequest.input('consultation_desc', sql.VarChar, detail.consultation_desc);
-                            updateRequest.input('cost', sql.VarChar, tryParseCurrency(detail.cost));
-                            return updateRequest.query(
-                                `UPDATE Consultations
-                                 SET title = @title
-                                 , session_time = @session_time
-                                 , short = @consultation
-                                 , description = @consultation_desc
-                                 , cost = @cost
-                                 WHERE id = @id;`
-                            );
-                        }
-
-                        let insertRequest = new sql.Request(sqlUpdateConsultation);
-                        insertRequest.input('type', sql.VarChar, 'diet');
-                        insertRequest.input('title', sql.VarChar, detail.title);
-                        insertRequest.input('session_time', sql.VarChar, detail.session_time);
-                        insertRequest.input('consultation', sql.VarChar, detail.consultation);
-                        insertRequest.input('consultation_desc', sql.VarChar, detail.consultation_desc);
-                        insertRequest.input('cost', sql.VarChar, tryParseCurrency(detail.cost));
-                        return insertRequest.query(
-                            `INSERT INTO Consultations (type, title, session_time, short, description, cost)
-                             VALUES (@type, @title, @session_time, @consultation, @consultation_desc, @cost);`
+            executeQuery(
+                `UPDATE Headers
+                 SET venue = @venue
+                 , short = @short
+                 , description = @description
+                 FROM Headers
+                 WHERE type = @type;`,
+                function (request, sql) {
+                    request.input('venue', sql.VarChar, consultation.venue);
+                    request.input('short', sql.VarChar, consultation.short);
+                    request.input('description', sql.VarChar, consultation.description);
+                    request.input('type', sql.VarChar, 'diet');
+                }
+            ).then(function () {
+                return executeQuery(deleteQuery);
+            }).then(function () {
+                const savePromises = consultationDetails.map(function (detail) {
+                    if (detail.id) {
+                        return executeQuery(
+                            `UPDATE Consultations
+                             SET title = @title
+                             , session_time = @session_time
+                             , short = @consultation
+                             , description = @consultation_desc
+                             , cost = @cost
+                             WHERE id = @id;`,
+                            function (request, sql) {
+                                request.input('id', sql.Int, detail.id);
+                                request.input('title', sql.VarChar, detail.title);
+                                request.input('session_time', sql.VarChar, detail.session_time);
+                                request.input('consultation', sql.VarChar, detail.consultation);
+                                request.input('consultation_desc', sql.VarChar, detail.consultation_desc);
+                                request.input('cost', sql.VarChar, tryParseCurrency(detail.cost));
+                            }
                         );
-                    });
-
-                    return Promise.all(saveRequests);
-                }).then(function () {
-                    return res.status(200).json(consultation);
-                }).catch(function (err) {
-                    console.log("ConsultationDetails " + err);
-                    return res.status(500).send({ message: 'Unable to save consultation details.' });
+                    }
+                    return executeQuery(
+                        `INSERT INTO Consultations (type, title, session_time, short, description, cost)
+                         VALUES (@type, @title, @session_time, @consultation, @consultation_desc, @cost);`,
+                        function (request, sql) {
+                            request.input('type', sql.VarChar, 'diet');
+                            request.input('title', sql.VarChar, detail.title);
+                            request.input('session_time', sql.VarChar, detail.session_time);
+                            request.input('consultation', sql.VarChar, detail.consultation);
+                            request.input('consultation_desc', sql.VarChar, detail.consultation_desc);
+                            request.input('cost', sql.VarChar, tryParseCurrency(detail.cost));
+                        }
+                    );
                 });
-            })
+                return Promise.all(savePromises);
+            }).then(function () {
+                return res.status(200).json(consultation);
+            }).catch(function (err) {
+                console.log("ConsultationDetails " + err);
+                return res.status(500).send({ message: 'Unable to save consultation details.' });
+            });
         })
         .delete(function (req, res) {
             if (!req.headers.authorization) {
@@ -146,42 +146,42 @@ let consultationRoutes = function () {
             if (moment().unix() > payload.exp) {
                 return res.status(401).send({ message: "You are not authorized" })
             }
-            const sqlDeleteConsultation = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlDeleteConsultation);
-                request.input('id', sql.Int, req.body.id);
-                request.query(
-                    `DELETE FROM Consultations
-                     WHERE id = @id`
-                ).then(res.status(201).send("Consultation has been deleted.")).catch(function (err) {
-                    console.log("delete Consultation: " + err);
-                });
+            executeQuery(
+                `DELETE FROM Consultations
+                 WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.body.id);
+                }
+            ).then(function () {
+                res.status(201).send("Consultation has been deleted.");
+            }).catch(function (err) {
+                console.log("delete Consultation: " + err);
+                res.status(500).send("Unable to delete consultation.");
             });
         })
         .get(function (req, res) {
-            const sqlConsultations = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlConsultations);
-                request.query(
-                    `SELECT C.id AS id
-                    ,C.type AS type
-                    ,H.header AS header
-                    ,H.short AS short
-                    ,H.description AS description
-                    ,H.venue AS venue
-                    ,C.session_time AS session_time
-                    ,C.title AS title
-                    ,C.short AS consultation
-                    ,C.description AS consultation_desc
-                    ,CASE WHEN ISNUMERIC(C.cost) = 1
-                                 THEN FORMAT(TRY_PARSE(C.cost AS money), 'C', 'de-de')
-                                 ELSE C.cost END AS cost
-                    ,C.icon AS icon
-                    ,C.iconHeight AS iconHeight
-                    ,C.iconWidth AS iconWidth
-                    FROM Headers H
-                    LEFT JOIN Consultations C
-                    ON H.type = C.type
-                    WHERE H.type = 'diet'`
-                ).then(function (recordset) {
+            executeQuery(
+                `SELECT C.id AS id
+                ,C.type AS type
+                ,H.header AS header
+                ,H.short AS short
+                ,H.description AS description
+                ,H.venue AS venue
+                ,C.session_time AS session_time
+                ,C.title AS title
+                ,C.short AS consultation
+                ,C.description AS consultation_desc
+                ,CASE WHEN ISNUMERIC(C.cost) = 1
+                             THEN FORMAT(TRY_PARSE(C.cost AS money), 'C', 'de-de')
+                             ELSE C.cost END AS cost
+                ,C.icon AS icon
+                ,C.iconHeight AS iconHeight
+                ,C.iconWidth AS iconWidth
+                FROM Headers H
+                LEFT JOIN Consultations C
+                ON H.type = C.type
+                WHERE H.type = 'diet'`
+            ).then(function (recordset) {
                     if (!recordset || recordset.length === 0) {
                         return res.json({
                             header: '',
@@ -222,16 +222,13 @@ let consultationRoutes = function () {
                     res.json(consultation);
                 }).catch(function (err) {
                     console.log("consultations: " + err);
+                    res.status(500).send("Unable to load consultations.");
                 });
-            });
         });
 
     consultationRouter.route('/consultations/:consultationId')
         .get(function (req, res) {
-            const sqlConsultation = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlConsultation);
-                request.input('id', sql.Int, req.params.consultationId);
-                request.query(`SELECT id
+            executeQuery(`SELECT id
                                 ,type
                                 ,session_time
                                 ,title
@@ -239,8 +236,11 @@ let consultationRoutes = function () {
                                 ,consultation_desc
                                 ,cost
                                 FROM consultations
-                                WHERE id = @id`
-                ).then(function (recordset) {
+                                WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.params.consultationId);
+                }
+            ).then(function (recordset) {
                     if (recordset.length > 0) {
                         res.json(recordset);
                     }
@@ -249,8 +249,8 @@ let consultationRoutes = function () {
                     }
                 }).catch(function (err) {
                     console.log("Consultation: " + err);
+                    res.status(500).send("Unable to load consultation.");
                 });
-            });
         })
         .delete(function (req, res) {
             if (!req.headers.authorization) {
@@ -264,15 +264,17 @@ let consultationRoutes = function () {
             if (moment().unix() > payload.exp) {
                 return res.status(401).send({ message: "You are not authorized" })
             }
-            const sqlDeleteConsultation = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlDeleteConsultation);
-                request.input('id', sql.Int, req.params.consultationId);
-                request.query(
-                    `DELETE FROM Consultations
-                     WHERE id = @id`
-                ).then(res.status(201).send("Consultation has been deleted.")).catch(function (err) {
-                    console.log("delete Consultation: " + err);
-                });
+            executeQuery(
+                `DELETE FROM Consultations
+                 WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.params.consultationId);
+                }
+            ).then(function () {
+                res.status(201).send("Consultation has been deleted.");
+            }).catch(function (err) {
+                console.log("delete Consultation: " + err);
+                res.status(500).send("Unable to delete consultation.");
             });
         });
 

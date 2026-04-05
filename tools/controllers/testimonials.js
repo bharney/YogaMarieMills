@@ -1,8 +1,8 @@
 import express from 'express';
-import sql from 'mssql';
-import {secret, dbconfig} from '../../secrets';
+import {secret} from '../../secrets';
 import jwt from 'jwt-simple';
 import moment from 'moment';
+import { executeQuery } from '../sqlQuery';
 
 let testimonialRoutes = function () {
 
@@ -22,22 +22,23 @@ let testimonialRoutes = function () {
                 return res.status(401).send({ message: "You are not authorized" })
             }
             let testimonial = (req.body);
-            for (let prop in testimonial.testimonial_details) {
-                if (testimonial.testimonial_details.hasOwnProperty(prop)) {
-                    const sqlInsertTestimonial = new sql.Connection(dbconfig, function () {
-                        let request = new sql.Request(sqlInsertTestimonial);
+            const insertPromises = Object.keys(testimonial.testimonial_details || {}).map(function (prop) {
+                return executeQuery(
+                    `INSERT INTO Testimonials (type, testimonial, name)
+                     VALUES (@type, @testimonial, @name)`,
+                    function (request, sql) {
                         request.input('type', sql.VarChar, testimonial.type);
                         request.input('testimonial', sql.VarChar, testimonial.testimonial);
                         request.input('name', sql.VarChar, testimonial.name);
-                        request.query(
-                            `INSERT INTO Testimonials (type, testimonial, name)
-                             VALUES (@type, @testimonial, @name)`
-                        ).then(res.status(201).send(testimonial)).catch(function (err) {
-                            console.log("insert testimonial: " + err);
-                        });
-                    });
-                }
-            }
+                    }
+                );
+            });
+            Promise.all(insertPromises).then(function () {
+                res.status(201).send(testimonial);
+            }).catch(function (err) {
+                console.log("insert testimonial: " + err);
+                res.status(500).send("Unable to save testimonial.");
+            });
         })
         .put(function (req, res) {
             if (!req.headers.authorization) {
@@ -52,68 +53,58 @@ let testimonialRoutes = function () {
                 return res.status(401).send({ message: "You are not authorized" })
             }
             let testimonial = (req.body);
-            const sqlUpdateConsultation = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlUpdateConsultation);
-                request.input('short', sql.VarChar, testimonial.short);
-                request.input('description', sql.VarChar, testimonial.description);
-                request.input('type', sql.VarChar, 'Testimonial');
-                request.query(
-                    `UPDATE Headers
-                     SET short = @short
-                     ,description = @description
-                     FROM Headers
-                     WHERE type = @type;`
-                ).then(function () {
-                        const sqlDeleteTestimonials = new sql.Connection(dbconfig, function () {
-                        let request = new sql.Request(sqlDeleteTestimonials);
-                        request.query(
-                            `DELETE FROM Testimonials
-                            WHERE id NOT IN (${testimonial.testimonial_details.filter(testimonial_details => testimonial_details.id).map(function(obj){return obj.id;}).join(',')})`
-                        ).then(function () {
-                               for (let prop in testimonial.testimonial_details) {
-                                    if (testimonial.testimonial_details.hasOwnProperty(prop)) {
-                                        if (testimonial.testimonial_details[prop].id) {
-                                           const sqlUpdateTestimonial = new sql.Connection(dbconfig, function () {
-                                                let request = new sql.Request(sqlUpdateTestimonial);
-                                                request.input('id', sql.Int, testimonial.testimonial_details[prop].id);
-                                                request.input('testimonial', sql.VarChar, testimonial.testimonial_details[prop].testimonial);
-                                                request.input('name', sql.VarChar, testimonial.testimonial_details[prop].name);
-                                                request.query(
-                                                    `UPDATE Testimonials
-                                                    SET testimonial = @testimonial
-                                                    ,name = @name
-                                                    WHERE id = @id`
-                                                ).then(console.log("TestimonialDetails Updated")
-                                                ).catch(function (err) {
-                                                    console.log("update TestimonialDetails: " + err);
-                                                });
-                                            });
-                                        }
-                                        else {
-                                        const sqlInsertTestimonial = new sql.Connection(dbconfig, function () {
-                                            let request = new sql.Request(sqlInsertTestimonial);
-                                            request.input('type', sql.VarChar, 'Testimonial');
-                                            request.input('testimonial', sql.VarChar, testimonial.testimonial_details[prop].testimonial);
-                                            request.input('name', sql.VarChar, testimonial.testimonial_details[prop].name);
-                                            request.query(
-                                                `INSERT INTO Testimonials (type, testimonial, name)
-                                                VALUES (@type, @testimonial, @name)`
-                                            ).then(console.log("TestimonialDetails Inserted")
-                                            ).catch(function (err) {
-                                                console.log("insert TestimonialDetails: " + err);
-                                            });
-                                        });
-                                    }
-                                }
+            const existingIds = (testimonial.testimonial_details || [])
+                .filter(function (d) { return d.id; })
+                .map(function (d) { return d.id; });
+            const deleteQuery = existingIds.length > 0
+                ? `DELETE FROM Testimonials WHERE id NOT IN (${existingIds.join(',')})`
+                : `DELETE FROM Testimonials`;
+
+            executeQuery(
+                `UPDATE Headers
+                 SET short = @short
+                 ,description = @description
+                 FROM Headers
+                 WHERE type = @type;`,
+                function (request, sql) {
+                    request.input('short', sql.VarChar, testimonial.short);
+                    request.input('description', sql.VarChar, testimonial.description);
+                    request.input('type', sql.VarChar, 'Testimonial');
+                }
+            ).then(function () {
+                return executeQuery(deleteQuery);
+            }).then(function () {
+                const savePromises = (testimonial.testimonial_details || []).map(function (detail) {
+                    if (detail.id) {
+                        return executeQuery(
+                            `UPDATE Testimonials
+                            SET testimonial = @testimonial
+                            ,name = @name
+                            WHERE id = @id`,
+                            function (request, sql) {
+                                request.input('id', sql.Int, detail.id);
+                                request.input('testimonial', sql.VarChar, detail.testimonial);
+                                request.input('name', sql.VarChar, detail.name);
                             }
-                        }).catch(function (err) {
-                            console.log("Testimonial delete" + err);
-                        });
-                    });
-                }).catch(function (err) {
-                        console.log("Testimonial Header: " + err);
+                        );
+                    }
+                    return executeQuery(
+                        `INSERT INTO Testimonials (type, testimonial, name)
+                        VALUES (@type, @testimonial, @name)`,
+                        function (request, sql) {
+                            request.input('type', sql.VarChar, 'Testimonial');
+                            request.input('testimonial', sql.VarChar, detail.testimonial);
+                            request.input('name', sql.VarChar, detail.name);
+                        }
+                    );
                 });
-            })
+                return Promise.all(savePromises);
+            }).then(function () {
+                res.status(201).json(testimonial);
+            }).catch(function (err) {
+                console.log("Testimonial: " + err);
+                res.status(500).send("Unable to save testimonials.");
+            });
         })
         .delete(function (req, res) {
             if (!req.headers.authorization) {
@@ -127,43 +118,43 @@ let testimonialRoutes = function () {
             if (moment().unix() > payload.exp) {
                 return res.status(401).send({ message: "You are not authorized" })
             }
-            const sqlDeleteTestimonial = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlDeleteTestimonial);
-                request.input('id', sql.Int, req.body.id);
-                request.query(
-                    `DELETE FROM Testimonials
-                     WHERE id = @id`
-                ).then(res.status(201).send("Testimonial has been deleted.")).catch(function (err) {
-                    console.log("delete testimonial: " + err);
-                });
+            executeQuery(
+                `DELETE FROM Testimonials
+                 WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.body.id);
+                }
+            ).then(function () {
+                res.status(201).send("Testimonial has been deleted.");
+            }).catch(function (err) {
+                console.log("delete testimonial: " + err);
+                res.status(500).send("Unable to delete testimonial.");
             });
         })
         .get(function (req, res) {
-            const sqlTestimonials = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlTestimonials);
-                request.query(
-                    `SELECT
-                        H.id
-                        ,H.type
-                        ,H.short AS short
-                        ,H.header AS header
-                        ,H.description AS description
-                        ,NULL AS testimonial
-                        ,NULL AS name
-                        FROM Headers H
-                        WHERE H.type IN (SELECT T.type FROM Testimonials T)
+            executeQuery(
+                `SELECT
+                    H.id
+                    ,H.type
+                    ,H.short AS short
+                    ,H.header AS header
+                    ,H.description AS description
+                    ,NULL AS testimonial
+                    ,NULL AS name
+                    FROM Headers H
+                    WHERE H.type IN (SELECT T.type FROM Testimonials T)
 
-                        UNION ALL
+                    UNION ALL
 
-                        SELECT T.id AS id
-                        ,T.type AS type
-                        ,NULL as short
-                        ,NULL as header
-                        ,NULL as description
-                        ,T.testimonial AS testimonial
-                        ,T.name AS name
-                        FROM Testimonials T`
-                ).then(function (recordset) {
+                    SELECT T.id AS id
+                    ,T.type AS type
+                    ,NULL as short
+                    ,NULL as header
+                    ,NULL as description
+                    ,T.testimonial AS testimonial
+                    ,T.name AS name
+                    FROM Testimonials T`
+            ).then(function (recordset) {
                     if (!recordset || recordset.length === 0) {
                         return res.json({
                             header: '',
@@ -195,26 +186,28 @@ let testimonialRoutes = function () {
                     res.json(testimonials);
                 }).catch(function (err) {
                     console.log("testimonials: " + err);
+                    res.status(500).send("Unable to load testimonials.");
                 });
-            });
         });
 
     testimonialRouter.route('/testimonials/:testimonialId')
         .get(function (req, res) {
-            const sqlTestimonials = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlTestimonials);
-                request.query(
-                    `SELECT id
+            executeQuery(
+                `SELECT id
                     ,type
                     ,testimonial
                     ,name
-                    FROM Testimonials`
-                ).then(function (recordset) {
+                    FROM Testimonials
+                    WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.params.testimonialId);
+                }
+            ).then(function (recordset) {
                     res.json(recordset);
                 }).catch(function (err) {
                     console.log("testimonials: " + err);
+                    res.status(500).send("Unable to load testimonial.");
                 });
-            });
         })
         .delete(function (req, res) {
             if (!req.headers.authorization) {
@@ -228,15 +221,17 @@ let testimonialRoutes = function () {
             if (moment().unix() > payload.exp) {
                 return res.status(401).send({ message: "You are not authorized" })
             }
-            const sqlDeleteTestimonial = new sql.Connection(dbconfig, function () {
-                let request = new sql.Request(sqlDeleteTestimonial);
-                request.input('id', sql.Int, req.params.testimonialId);
-                request.query(
-                    `DELETE FROM Testimonials
-                     WHERE id = @id`
-                ).then(res.status(201).send("Testimonial has been deleted.")).catch(function (err) {
-                    console.log("delete testimonial: " + err);
-                });
+            executeQuery(
+                `DELETE FROM Testimonials
+                 WHERE id = @id`,
+                function (request, sql) {
+                    request.input('id', sql.Int, req.params.testimonialId);
+                }
+            ).then(function () {
+                res.status(201).send("Testimonial has been deleted.");
+            }).catch(function (err) {
+                console.log("delete testimonial: " + err);
+                res.status(500).send("Unable to delete testimonial.");
             });
         });
 
